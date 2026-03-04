@@ -15,7 +15,7 @@ export function App() {
   const [gameKey, setGameKey] = useState(0)
   const [completeResult, setCompleteResult] = useState<RoundResult | null>(null)
 
-  const handleLogin = useCallback((_username: string) => {
+  const handleLogin = useCallback(() => {
     setScreen('home')
   }, [])
 

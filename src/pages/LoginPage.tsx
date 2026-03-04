@@ -2,7 +2,7 @@ import { useState, useRef } from 'preact/hooks'
 import type { JSX } from 'preact'
 
 interface LoginPageProps {
-  onLogin: (username: string) => void
+  onLogin: () => void
   login: (username: string, pin: string) => Promise<{ success: boolean; error?: string }>
 }
 
@@ -17,7 +17,7 @@ export function LoginPage({ onLogin, login }: LoginPageProps) {
     const result = await login(username, pin)
     if (result.success) {
       setError('')
-      onLogin(username.trim().toLowerCase())
+      onLogin()
     } else {
       setError(result.error ?? 'Okänt fel')
     }

@@ -106,7 +106,7 @@ export function useGame(username: string) {
     const td: TableData = tables[table] ?? { wins: 0, clear: [], retry: [] }
 
     const newClear = [...new Set([...(td.clear || []), ...clearPile])]
-    let newRetry = retryPile.filter(n => !newClear.includes(n))
+    const newRetry = retryPile.filter(n => !newClear.includes(n))
     const allClear = newClear.length === 10
     let wins = td.wins || 0
 
@@ -115,10 +115,6 @@ export function useGame(username: string) {
       await storage.saveTableData(username, table, { wins, clear: [], retry: [] })
     } else {
       await storage.saveTableData(username, table, { wins, clear: newClear, retry: newRetry })
-    }
-
-    if (allClear) {
-      newRetry = []
     }
 
     setRoundResult({

@@ -109,7 +109,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
 
   const question = `${gameState.table} × ${current.n}`
   const answer = gameState.table * current.n
-  const displayValue = inputValue || '?'
+  const answerDisplayValue = inputValue || '?'
   const answerDisplayClass = `answer-display${answerState !== 'idle' ? ` ${answerState}` : ''}`
 
   return (
@@ -150,7 +150,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
             </div>
           </div>
 
-          <div class={answerDisplayClass}>{displayValue}</div>
+          <div class={answerDisplayClass}>{answerDisplayValue}</div>
         </div>
 
         <div class="game-keypad-col">

@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from 'preact/hooks'
+import { getPreference, setPreference } from '../lib/preferences'
 
 interface NumericKeypadProps {
   value: string
@@ -15,9 +16,7 @@ const KEYS = [
   ['⌫', '0', '✓'],
 ]
 
-function getHandednessKey(user: string): string {
-  return `mattekort_hand_${user}`
-}
+const HAND_PREF_KEY = 'handedness'
 
 export function NumericKeypad({ value, onChange, onSubmit, disabled, user }: NumericKeypadProps) {
   const [pressedKey, setPressedKey] = useState<string | null>(null)
@@ -25,24 +24,16 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user }: Num
 
   // Load persisted handedness preference
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(getHandednessKey(user))
-      if (saved !== null) {
-        setRightHanded(saved === 'right')
-      }
-    } catch {
-      // ignore storage errors
+    const saved = getPreference(user, HAND_PREF_KEY)
+    if (saved !== null) {
+      setRightHanded(saved === 'right')
     }
   }, [user])
 
   const toggleHand = useCallback(() => {
     setRightHanded(prev => {
       const next = !prev
-      try {
-        localStorage.setItem(getHandednessKey(user), next ? 'right' : 'left')
-      } catch {
-        // ignore storage errors
-      }
+      setPreference(user, HAND_PREF_KEY, next ? 'right' : 'left')
       return next
     })
   }, [user])

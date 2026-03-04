@@ -32,13 +32,13 @@ function computeStats(userData: UserData): Stats {
 
   for (const [tableStr, td] of Object.entries(tables)) {
     const t = parseInt(tableStr)
-    const plays = td.wins + (td.clear.length > 0 || td.retry.length > 0 ? 1 : 0)
+    const tablePlayCount = td.wins + (td.clear.length > 0 || td.retry.length > 0 ? 1 : 0)
     totalWins += td.wins
     totalClears += td.clear.length
     totalRetries += td.retry.length
 
-    if (plays > mostPlayedCount) {
-      mostPlayedCount = plays
+    if (tablePlayCount > mostPlayedCount) {
+      mostPlayedCount = tablePlayCount
       mostPlayedTable = t
     }
 

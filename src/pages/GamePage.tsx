@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'preact/hooks'
-import type { JSX } from 'preact'
 import { COLORS, COLORS2 } from '../lib/constants'
 import { useGame } from '../hooks/useGame'
+import { NumericKeypad } from '../components/NumericKeypad'
 import type { RoundResult } from '../hooks/useGame'
 
 interface GamePageProps {
@@ -12,13 +12,12 @@ interface GamePageProps {
 }
 
 export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
-  const { gameState, roundResult, startGame, submitAnswer, peekCard } = useGame(user)
+  const { gameState, roundResult, startGame, submitAnswer, peekCard, saveProgress } = useGame(user)
   const [inputValue, setInputValue] = useState('')
-  const [inputClass, setInputClass] = useState('answer-input')
+  const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle')
   const [flipped, setFlipped] = useState(false)
   const [shaking, setShaking] = useState(false)
   const [cardKey, setCardKey] = useState(0)
-  const inputRef = useRef<HTMLInputElement>(null)
   const startedRef = useRef(false)
 
   // Start game on mount
@@ -42,8 +41,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
     }
   }, [roundResult, onComplete])
 
-  // Focus input when current card changes
-  // Track card changes via a ref to detect when current card actually changes
+  // Track card changes to reset input state
   const prevCardRef = useRef<{ n: number; deckLen: number } | null>(null)
   useEffect(() => {
     const curr = gameState.current
@@ -51,13 +49,16 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
     if (curr && (!prev || prev.n !== curr.n || prev.deckLen !== gameState.deck.length)) {
       prevCardRef.current = { n: curr.n, deckLen: gameState.deck.length }
       setInputValue('')
-      setInputClass('answer-input')
+      setAnswerState('idle')
       setFlipped(false)
       setShaking(false)
       setCardKey(k => k + 1)
-      setTimeout(() => inputRef.current?.focus(), 50)
     }
   }, [gameState])
+
+  const handleBack = useCallback(() => {
+    void saveProgress().then(() => onBack())
+  }, [saveProgress, onBack])
 
   const floatFeedback = useCallback((text: string, good: boolean) => {
     const el = document.createElement('div')
@@ -68,8 +69,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
     setTimeout(() => el.remove(), 900)
   }, [])
 
-  const handleSubmit = useCallback((e?: JSX.TargetedEvent<HTMLFormElement>) => {
-    e?.preventDefault()
+  const handleSubmit = useCallback(() => {
     if (flipped) return
 
     const val = parseInt(inputValue)
@@ -77,20 +77,18 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
 
     const result = submitAnswer(val)
     if (result === 'correct') {
-      setInputClass('answer-input correct')
+      setAnswerState('correct')
       floatFeedback('🎉 Rätt!', true)
       setFlipped(true)
-      // After flip animation, card will move (handled by useGame timeout)
     } else if (result === 'wrong') {
       const correct = gameState.table * (gameState.current?.n ?? 0)
-      setInputClass('answer-input wrong')
+      setAnswerState('wrong')
       setShaking(true)
       floatFeedback(`✗ Det är ${correct}`, false)
       setTimeout(() => {
         setShaking(false)
-        setInputClass('answer-input')
+        setAnswerState('idle')
         setInputValue('')
-        inputRef.current?.focus()
       }, 600)
     }
   }, [inputValue, flipped, submitAnswer, floatFeedback, gameState.table, gameState.current?.n])
@@ -99,7 +97,6 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
     if (flipped) return
     setFlipped(true)
     peekCard()
-    // After peek timeout, card will be moved (handled by useGame)
   }, [flipped, peekCard])
 
   const { deck, clearPile, retryPile, current } = gameState
@@ -112,59 +109,61 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
 
   const question = `${gameState.table} × ${current.n}`
   const answer = gameState.table * current.n
+  const displayValue = inputValue || '?'
+  const answerDisplayClass = `answer-display${answerState !== 'idle' ? ` ${answerState}` : ''}`
 
   return (
     <div class="screen active game-screen">
       <div class="game-header">
-        <button class="btn-back" onClick={onBack}>← </button>
+        <button class="btn-back" onClick={handleBack}>← </button>
         <div class="game-title">Gångertabell {gameState.table}</div>
         <div class="progress-text">{done}/{total}</div>
       </div>
 
-      <div class="piles-bar">
-        <div class="pile-box deck-pile">
-          <div class="pile-count">{deck.length}</div>
-          <div class="pile-label">Kort kvar</div>
-        </div>
-        <div class="pile-box clear-pile">
-          <div class="pile-count">{clearPile.length}</div>
-          <div class="pile-label">Klara</div>
-        </div>
-        <div class="pile-box retry-pile">
-          <div class="pile-count">{retryPile.length}</div>
-          <div class="pile-label">Öva igen</div>
-        </div>
-      </div>
-
-      <div class="card-area" key={cardKey}>
-        <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}`}>
-          <div class="card-face card-front">
-            <div class="card-question">{question}</div>
-            <div class="card-hint">Skriv ditt svar ↓</div>
+      <div class="game-layout">
+        <div class="game-card-col">
+          <div class="piles-bar">
+            <div class="pile-box deck-pile">
+              <div class="pile-count">{deck.length}</div>
+              <div class="pile-label">Kort kvar</div>
+            </div>
+            <div class="pile-box clear-pile">
+              <div class="pile-count">{clearPile.length}</div>
+              <div class="pile-label">Klara</div>
+            </div>
+            <div class="pile-box retry-pile">
+              <div class="pile-count">{retryPile.length}</div>
+              <div class="pile-label">Öva igen</div>
+            </div>
           </div>
-          <div class="card-face card-back">
-            <div class="card-answer">{answer}</div>
-            <div class="card-answer-label">{question} = {answer}</div>
-          </div>
-        </div>
-      </div>
 
-      <form class="answer-area" onSubmit={handleSubmit}>
-        <input
-          ref={inputRef}
-          type="tel"
-          inputMode="numeric"
-          class={inputClass}
-          value={inputValue}
-          onInput={(e) => setInputValue((e.target as HTMLInputElement).value)}
-          placeholder="?"
-          autoComplete="off"
-        />
-        <div class="action-btns">
+          <div class="card-area" key={cardKey}>
+            <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}`}>
+              <div class="card-face card-front">
+                <div class="card-question">{question}</div>
+                <div class="card-hint">Skriv ditt svar ↓</div>
+              </div>
+              <div class="card-face card-back">
+                <div class="card-answer">{answer}</div>
+                <div class="card-answer-label">{question} = {answer}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class={answerDisplayClass}>{displayValue}</div>
+        </div>
+
+        <div class="game-keypad-col">
           <button type="button" class="btn-peek" onClick={handlePeek}>👀 Titta</button>
-          <button type="submit" class="btn-submit">Svara ✓</button>
+          <NumericKeypad
+            value={inputValue}
+            onChange={setInputValue}
+            onSubmit={handleSubmit}
+            disabled={flipped}
+            user={user}
+          />
         </div>
-      </form>
+      </div>
     </div>
   )
 }

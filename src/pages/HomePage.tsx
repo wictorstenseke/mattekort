@@ -7,9 +7,10 @@ interface HomePageProps {
   user: string
   onSelectTable: (table: number) => void
   onLogout: () => void
+  onStats: () => void
 }
 
-export function HomePage({ user, onSelectTable, onLogout }: HomePageProps) {
+export function HomePage({ user, onSelectTable, onLogout, onStats }: HomePageProps) {
   const [tablesData, setTablesData] = useState<Record<number, TableData>>({})
 
   useEffect(() => {
@@ -26,8 +27,11 @@ export function HomePage({ user, onSelectTable, onLogout }: HomePageProps) {
     <div class="screen active home-screen">
       <div class="top-bar">
         <h1>🎯 Gångertabeller</h1>
-        <div class="user-chip" onClick={onLogout}>
-          👤 {user} ✕
+        <div class="top-bar-actions">
+          <button class="stats-chip" onClick={onStats}>📊</button>
+          <div class="user-chip" onClick={onLogout}>
+            👤 {user} ✕
+          </div>
         </div>
       </div>
 

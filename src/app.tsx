@@ -4,9 +4,10 @@ import { LoginPage } from './pages/LoginPage'
 import { HomePage } from './pages/HomePage'
 import { GamePage } from './pages/GamePage'
 import { CompletePage } from './pages/CompletePage'
+import { StatsPage } from './pages/StatsPage'
 import type { RoundResult } from './hooks/useGame'
 
-type Screen = 'login' | 'home' | 'game' | 'complete'
+type Screen = 'login' | 'home' | 'game' | 'complete' | 'stats'
 
 export function App() {
   const { currentUser, login, logout } = useAuth()
@@ -48,6 +49,14 @@ export function App() {
     setScreen('home')
   }, [])
 
+  const handleStats = useCallback(() => {
+    setScreen('stats')
+  }, [])
+
+  const handleStatsBack = useCallback(() => {
+    setScreen('home')
+  }, [])
+
   switch (screen) {
     case 'login':
       return <LoginPage login={login} onLogin={handleLogin} />
@@ -57,6 +66,7 @@ export function App() {
           user={currentUser!}
           onSelectTable={handleSelectTable}
           onLogout={handleLogout}
+          onStats={handleStats}
         />
       )
     case 'game':
@@ -77,6 +87,13 @@ export function App() {
           onBack={handleCompleteBack}
         />
       ) : null
+    case 'stats':
+      return (
+        <StatsPage
+          user={currentUser!}
+          onBack={handleStatsBack}
+        />
+      )
     default:
       return null
   }

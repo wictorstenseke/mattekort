@@ -157,7 +157,7 @@ export function useGame(username: string) {
       updateState(prev => ({ ...prev, busy: true }))
       setTimeout(() => {
         moveCard(true)
-      }, 900)
+      }, 1400)
       return 'correct'
     } else {
       return 'wrong'
@@ -170,12 +170,25 @@ export function useGame(username: string) {
     updateState(prev => ({ ...prev, peeked: true, busy: true }))
     setTimeout(() => {
       moveCard(false)
-    }, 1800)
+    }, 2400)
   }, [moveCard, updateState])
 
   const continueGame = useCallback(() => {
     void startGame(gsRef.current.table)
   }, [startGame])
+
+  /** Save progress mid-round so exiting the game screen doesn't lose answered cards. */
+  const saveProgress = useCallback(async () => {
+    const gs = gsRef.current
+    if (gs.clearPile.length === 0 && gs.retryPile.length === 0) return
+
+    const userData = await storage.getUser(username)
+    const tables = userData?.tables ?? {}
+    const td: TableData = tables[gs.table] ?? { wins: 0, clear: [], retry: [] }
+
+    const { newClear, newRetry, wins } = computeEndRound(td, gs.clearPile, gs.retryPile)
+    await storage.saveTableData(username, gs.table, { wins, clear: newClear, retry: newRetry })
+  }, [username])
 
   return {
     gameState,
@@ -184,5 +197,6 @@ export function useGame(username: string) {
     submitAnswer,
     peekCard,
     continueGame,
+    saveProgress,
   }
 }

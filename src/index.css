@@ -789,6 +789,7 @@ img.login-emoji {
   background: #FFF0E8;
   color: #E06B1F;
   box-shadow: 0 3px 10px rgba(224, 107, 31, .1);
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .keypad-key.key-delete.pressed {
@@ -799,6 +800,7 @@ img.login-emoji {
   background: linear-gradient(135deg, var(--tc), var(--tc2));
   color: white;
   box-shadow: 0 4px 14px rgba(0, 0, 0, .15);
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .keypad-key.key-submit.pressed {

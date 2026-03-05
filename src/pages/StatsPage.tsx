@@ -143,7 +143,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
                     <span class="stats-table-num">{t}</span>
                     <span class="stats-table-emoji-count">
                       <span class="stats-table-emoji">{EMOJIS[t - 1]}</span>
-                      <span class="stats-table-count">×{stats.tableCompletions[t] ?? 0}</span>
+                      <span class="stats-table-count">{stats.tableCompletions[t] ?? 0}×</span>
                     </span>
                   </div>
                 ))}

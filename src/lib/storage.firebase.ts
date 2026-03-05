@@ -4,6 +4,11 @@ import { auth, db } from './firebase'
 import { fakeEmail } from './constants'
 import type { StorageAdapter, UserData, TableData } from './storage'
 
+/** Firebase requires passwords ≥ 6 chars; PINs are 4 digits so we double them. */
+function pinToPassword(pin: string): string {
+  return pin + pin
+}
+
 function requireUid(): string {
   const uid = auth.currentUser?.uid
   if (!uid) throw new Error('Not authenticated')
@@ -24,13 +29,13 @@ export const firebaseStorageAdapter: StorageAdapter = {
   },
 
   async createUser(username: string, pin: string): Promise<void> {
-    const cred = await createUserWithEmailAndPassword(auth, fakeEmail(username), pin)
+    const cred = await createUserWithEmailAndPassword(auth, fakeEmail(username), pinToPassword(pin))
     await setDoc(doc(db, 'users', cred.user.uid), { tables: {} })
   },
 
   async validatePin(username: string, pin: string): Promise<boolean> {
     try {
-      await signInWithEmailAndPassword(auth, fakeEmail(username), pin)
+      await signInWithEmailAndPassword(auth, fakeEmail(username), pinToPassword(pin))
       return true
     } catch (err: unknown) {
       const code = (err as { code?: string }).code

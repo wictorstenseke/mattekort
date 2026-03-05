@@ -107,7 +107,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
 
   return (
     <div class="screen active stats-screen">
-      <div class="stats-header">
+      <div class="stats-header flex flex-wrap gap-3 md:gap-4">
         <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">🔙</button>
         <h1 class="stats-title">Statistik</h1>
       </div>

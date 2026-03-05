@@ -176,7 +176,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
 
   return (
     <div class="screen active game-screen">
-      <div class="game-header">
+      <div class="game-header flex flex-wrap gap-3 md:gap-4">
         <button type="button" class="back-chip" onClick={handleBack} aria-label="Tillbaka">🔙</button>
         <div class="game-title">Gångertabell {gameState.table}</div>
         <div class="progress-text">{done}/{total}</div>

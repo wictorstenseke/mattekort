@@ -25,9 +25,9 @@ export function HomePage({ user, onSelectTable, onLogout, onStats }: HomePagePro
 
   return (
     <div class="screen active home-screen">
-      <div class="top-bar">
-        <h1>🎯 Gångertabeller</h1>
-        <div class="top-bar-actions">
+      <div class="top-bar flex flex-col gap-4 items-center md:flex-row md:justify-between md:items-center">
+        <h1 class="text-center">🎯 Gångertabeller</h1>
+        <div class="top-bar-actions flex flex-wrap justify-center gap-2.5 md:flex-nowrap md:justify-end">
           <button class="stats-chip" onClick={onStats}>📊 Statistik</button>
           <button type="button" class="user-chip" onClick={onLogout}>
             🚪 Logga ut

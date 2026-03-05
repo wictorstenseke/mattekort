@@ -15,13 +15,13 @@ const rocketSvg = readFileSync(resolve(root, 'rocket.svg'))
 mkdirSync(resolve(root, 'public'), { recursive: true })
 
 const icons = [
-  { name: 'favicon.png',          size: 32,  padding: 0.12 },
-  { name: 'apple-touch-icon.png', size: 180, padding: 0.15 },
-  { name: 'icon-192.png',         size: 192, padding: 0.15 },
-  { name: 'icon-512.png',         size: 512, padding: 0.15 },
+  { name: 'favicon.png',          size: 32,  padding: 0.08, transparent: true },
+  { name: 'apple-touch-icon.png', size: 180, padding: 0.10 },
+  { name: 'icon-192.png',         size: 192, padding: 0.10 },
+  { name: 'icon-512.png',         size: 512, padding: 0.10 },
 ]
 
-for (const { name, size, padding } of icons) {
+for (const { name, size, padding, transparent } of icons) {
   const rocketSize = Math.round(size * (1 - padding * 2))
   const offset = Math.round(size * padding)
 
@@ -35,7 +35,7 @@ for (const { name, size, padding } of icons) {
       width: size,
       height: size,
       channels: 4,
-      background: { r: 255, g: 255, b: 255, alpha: 1 },
+      background: transparent ? { r: 0, g: 0, b: 0, alpha: 0 } : { r: 255, g: 255, b: 255, alpha: 1 },
     },
   })
     .composite([{ input: rocketBuffer, top: offset, left: offset }])

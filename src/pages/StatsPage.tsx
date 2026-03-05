@@ -15,6 +15,7 @@ interface Stats {
   totalWins: number
   totalClears: number
   totalRetries: number
+  tableCompletions: Record<number, number> // table -> times completed
 }
 
 function computeStats(userData: UserData): Stats {
@@ -74,7 +75,13 @@ function computeStats(userData: UserData): Stats {
     }
   }
 
-  return { mostPlayedTable, hardestNumber, easiestNumber, totalWins, totalClears, totalRetries }
+  const tableCompletions: Record<number, number> = {}
+  for (let t = 1; t <= 10; t++) {
+    const td = tables[t]
+    tableCompletions[t] = td?.wins ?? 0
+  }
+
+  return { mostPlayedTable, hardestNumber, easiestNumber, totalWins, totalClears, totalRetries, tableCompletions }
 }
 
 export function StatsPage({ user, onBack }: StatsPageProps) {
@@ -86,7 +93,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
       if (userData) {
         setStats(computeStats(userData))
       } else {
-        setStats({ mostPlayedTable: null, hardestNumber: null, easiestNumber: null, totalWins: 0, totalClears: 0, totalRetries: 0 })
+        setStats({ mostPlayedTable: null, hardestNumber: null, easiestNumber: null, totalWins: 0, totalClears: 0, totalRetries: 0, tableCompletions: {} })
       }
     }
     void load()
@@ -100,36 +107,52 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
 
   return (
     <div class="screen active stats-screen">
-      <div class="stats-box">
-        <button class="btn-back stats-back" onClick={onBack}>← </button>
-        <span class="stats-emoji">📊</span>
-        <h2>Statistik</h2>
+      <div class="stats-header">
+        <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">🔙</button>
+        <h1 class="stats-title">Statistik</h1>
+      </div>
 
+      <div class="stats-content">
         {!hasData ? (
           <p class="stats-empty">Ingen data ännu! Spela lite först 🎮</p>
         ) : (
           <>
             <div class="stats-grid">
-              <div class="stat-card">
+              <div class="stat-card" style={`--tc:${COLORS[4]}`}>
                 <div class="stat-icon">🏆</div>
                 <div class="stat-value">{stats.totalWins}</div>
                 <div class="stat-desc">Totala vinster</div>
               </div>
-              <div class="stat-card">
+              <div class="stat-card" style={`--tc:${COLORS[3]}`}>
                 <div class="stat-icon">✅</div>
                 <div class="stat-value">{stats.totalClears}</div>
                 <div class="stat-desc">Klara kort</div>
               </div>
-              <div class="stat-card">
+              <div class="stat-card" style={`--tc:${COLORS[1]}`}>
                 <div class="stat-icon">🔄</div>
                 <div class="stat-value">{stats.totalRetries}</div>
                 <div class="stat-desc">Öva igen</div>
               </div>
             </div>
 
+            <div class="stats-table-completions">
+              <div class="stats-table-completions-title">Tabeller klara (antal gånger)</div>
+              <div class="stats-table-completions-grid">
+                {Array.from({ length: 10 }, (_, i) => i + 1).map(t => (
+                  <div key={t} class="stats-table-completion-item" style={`--tc:${COLORS[t - 1]}`}>
+                    <span class="stats-table-num">{t}</span>
+                    <span class="stats-table-emoji-count">
+                      <span class="stats-table-emoji">{EMOJIS[t - 1]}</span>
+                      <span class="stats-table-count">×{stats.tableCompletions[t] ?? 0}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <div class="stats-highlights">
               {stats.mostPlayedTable !== null && (
-                <div class="highlight-row">
+                <div class="highlight-row" style={`--tc:${COLORS[stats.mostPlayedTable - 1]}`}>
                   <span class="highlight-icon" style={`color:${COLORS[stats.mostPlayedTable - 1]}`}>
                     {EMOJIS[stats.mostPlayedTable - 1]}
                   </span>
@@ -141,7 +164,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
               )}
 
               {stats.hardestNumber !== null && (
-                <div class="highlight-row">
+                <div class="highlight-row" style={`--tc:${COLORS[stats.hardestNumber.table - 1]}`}>
                   <span class="highlight-icon">🔥</span>
                   <div>
                     <div class="highlight-title">Svårast tal</div>
@@ -153,7 +176,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
               )}
 
               {stats.easiestNumber !== null && (
-                <div class="highlight-row">
+                <div class="highlight-row" style={`--tc:${COLORS[stats.easiestNumber.table - 1]}`}>
                   <span class="highlight-icon">⚡</span>
                   <div>
                     <div class="highlight-title">Lättaste tal</div>
@@ -166,8 +189,6 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
             </div>
           </>
         )}
-
-        <button class="btn-secondary" onClick={onBack}>← Tillbaka</button>
       </div>
     </div>
   )

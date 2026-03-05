@@ -182,6 +182,10 @@ export function useGame(username: string) {
     }, 2400)
   }, [moveCard, updateState])
 
+  const moveToRetry = useCallback(() => {
+    moveCard(false)
+  }, [moveCard])
+
   const continueGame = useCallback(() => {
     void startGame(gsRef.current.table)
   }, [startGame])
@@ -205,6 +209,7 @@ export function useGame(username: string) {
     startGame,
     submitAnswer,
     peekCard,
+    moveToRetry,
     continueGame,
     saveProgress,
   }

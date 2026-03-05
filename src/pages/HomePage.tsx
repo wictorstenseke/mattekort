@@ -28,13 +28,14 @@ export function HomePage({ user, onSelectTable, onLogout, onStats }: HomePagePro
       <div class="top-bar">
         <h1>🎯 Gångertabeller</h1>
         <div class="top-bar-actions">
-          <button class="stats-chip" onClick={onStats}>📊</button>
-          <div class="user-chip" onClick={onLogout}>
-            👤 {user} ✕
-          </div>
+          <button class="stats-chip" onClick={onStats}>📊 Statistik</button>
+          <button type="button" class="user-chip" onClick={onLogout}>
+            🚪 Logga ut
+          </button>
         </div>
       </div>
 
+      <div class="tables-grid-wrapper">
       <div class="tables-grid">
         {Array.from({ length: 10 }, (_, i) => i + 1).map(t => {
           const td: TableData = tablesData[t] ?? { wins: 0, clear: [], retry: [] }
@@ -64,6 +65,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats }: HomePagePro
             </div>
           )
         })}
+      </div>
       </div>
     </div>
   )

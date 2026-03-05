@@ -1,14 +1,24 @@
-import { useState, useCallback } from 'preact/hooks'
-import { signOut } from 'firebase/auth'
+import { useState, useCallback, useEffect } from 'preact/hooks'
+import { signOut, onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { storage } from '../lib/storageContext'
+import { emailToUsername } from '../lib/constants'
 
 interface AuthState {
   currentUser: string | null
+  authReady: boolean
 }
 
 export function useAuth() {
-  const [state, setState] = useState<AuthState>({ currentUser: null })
+  const [state, setState] = useState<AuthState>({ currentUser: null, authReady: false })
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      const username = user ? emailToUsername(user.email) : null
+      setState({ currentUser: username, authReady: true })
+    })
+    return () => unsub()
+  }, [])
 
   const login = useCallback(async (username: string, pin: string): Promise<{ success: boolean; error?: string }> => {
     const trimmed = username.trim().toLowerCase()
@@ -35,17 +45,18 @@ export function useAuth() {
       }
     }
 
-    setState({ currentUser: trimmed })
+    setState(s => ({ ...s, currentUser: trimmed }))
     return { success: true }
   }, [])
 
   const logout = useCallback(() => {
     void signOut(auth)
-    setState({ currentUser: null })
+    setState(s => ({ ...s, currentUser: null }))
   }, [])
 
   return {
     currentUser: state.currentUser,
+    authReady: state.authReady,
     login,
     logout,
   }

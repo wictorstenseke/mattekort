@@ -9,3 +9,9 @@ export const FAKE_EMAIL_DOMAIN = 'matte.kort'
 export function fakeEmail(username: string): string {
   return `${username}@${FAKE_EMAIL_DOMAIN}`
 }
+
+/** Extract username from fake email (username@matte.kort). */
+export function emailToUsername(email: string | null | undefined): string | null {
+  if (!email?.endsWith(`@${FAKE_EMAIL_DOMAIN}`)) return null
+  return email.slice(0, -(FAKE_EMAIL_DOMAIN.length + 1))
+}

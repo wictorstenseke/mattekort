@@ -54,7 +54,6 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
     } else if (key === '✓') {
       onSubmit()
     } else {
-      // Limit to 3 digits
       if (value.length < 3) {
         onChange(value + key)
       }
@@ -83,8 +82,14 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
       </div>
       <div class="keypad-toggle-separator" />
       <div class="keypad-toggle-row">
-        {onPeek && !flipped && (
-          <button type="button" class="btn-peek" onClick={onPeek} aria-label="Titta på svaret">
+        {onPeek && (
+          <button
+            type="button"
+            class="btn-peek"
+            onClick={onPeek}
+            disabled={flipped}
+            aria-label="Titta på svaret"
+          >
             <span class="btn-icon">👀</span>
             <span class="btn-text">Kolla svar</span>
           </button>

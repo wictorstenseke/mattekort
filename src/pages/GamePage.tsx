@@ -11,14 +11,19 @@ interface GamePageProps {
   onComplete: (result: RoundResult) => void
 }
 
+const SHOW_ANSWER_DURATION_MS = 12000
+
 export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
-  const { gameState, roundResult, startGame, submitAnswer, peekCard, saveProgress } = useGame(user)
+  const { gameState, roundResult, startGame, submitAnswer, peekCard, moveToRetry, saveProgress } = useGame(user)
   const [inputValue, setInputValue] = useState('')
   const [answerState, setAnswerState] = useState<'idle' | 'correct' | 'wrong'>('idle')
   const [flipped, setFlipped] = useState(false)
   const [shaking, setShaking] = useState(false)
+  const wrongAttemptsRef = useRef(0)
+  const [showAnswerAfterWrong, setShowAnswerAfterWrong] = useState(false)
   const [cardKey, setCardKey] = useState(0)
   const startedRef = useRef(false)
+  const showAnswerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Start game on mount
   useEffect(() => {
@@ -52,7 +57,13 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
       setAnswerState('idle')
       setFlipped(false)
       setShaking(false)
+      wrongAttemptsRef.current = 0
+      setShowAnswerAfterWrong(false)
       setCardKey(k => k + 1)
+      if (showAnswerTimerRef.current) {
+        clearTimeout(showAnswerTimerRef.current)
+        showAnswerTimerRef.current = null
+      }
     }
   }, [gameState])
 
@@ -81,17 +92,43 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
       floatFeedback('🎉 Rätt!', true)
       setFlipped(true)
     } else if (result === 'wrong') {
-      const correct = gameState.table * (gameState.current?.n ?? 0)
+      wrongAttemptsRef.current += 1
+      const attempts = wrongAttemptsRef.current
       setAnswerState('wrong')
       setShaking(true)
-      floatFeedback(`✗ Det är ${correct}`, false)
+      setInputValue('')
+      floatFeedback('✗', false)
       setTimeout(() => {
         setShaking(false)
-        setAnswerState('idle')
-        setInputValue('')
+        if (attempts < 2) {
+          setAnswerState('idle')
+        } else {
+          setFlipped(true)
+          setShowAnswerAfterWrong(true)
+        }
       }, 600)
     }
-  }, [inputValue, flipped, submitAnswer, floatFeedback, gameState.table, gameState.current?.n])
+  }, [inputValue, flipped, submitAnswer, floatFeedback])
+
+  const handleShowAnswerDismiss = useCallback(() => {
+    if (!showAnswerAfterWrong) return
+    if (showAnswerTimerRef.current) {
+      clearTimeout(showAnswerTimerRef.current)
+      showAnswerTimerRef.current = null
+    }
+    moveToRetry()
+  }, [showAnswerAfterWrong, moveToRetry])
+
+  useEffect(() => {
+    if (!showAnswerAfterWrong) return
+    showAnswerTimerRef.current = setTimeout(handleShowAnswerDismiss, SHOW_ANSWER_DURATION_MS)
+    return () => {
+      if (showAnswerTimerRef.current) {
+        clearTimeout(showAnswerTimerRef.current)
+        showAnswerTimerRef.current = null
+      }
+    }
+  }, [showAnswerAfterWrong, handleShowAnswerDismiss])
 
   const handlePeek = useCallback(() => {
     if (flipped) return
@@ -114,7 +151,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
   return (
     <div class="screen active game-screen">
       <div class="game-header">
-        <button class="btn-back" onClick={handleBack}>← </button>
+        <button type="button" class="back-chip" onClick={handleBack} aria-label="Tillbaka">🔙</button>
         <div class="game-title">Gångertabell {gameState.table}</div>
         <div class="progress-text">{done}/{total}</div>
       </div>
@@ -137,8 +174,14 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
               </div>
             </div>
 
-            <div class="card-area" key={cardKey}>
-              <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}${answerState === 'correct' ? ' correct' : ''}`}>
+            <div
+              class={`card-area${showAnswerAfterWrong ? ' card-area-clickable' : ''}`}
+              key={cardKey}
+              onClick={showAnswerAfterWrong ? handleShowAnswerDismiss : undefined}
+              role={showAnswerAfterWrong ? 'button' : undefined}
+              aria-label={showAnswerAfterWrong ? 'Klicka för att fortsätta' : undefined}
+            >
+              <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}${answerState === 'correct' && !showAnswerAfterWrong ? ' correct' : ''}`}>
                 <div class="card-face card-front">
                   <div class="card-question">{question}</div>
                 </div>
@@ -159,7 +202,7 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
               value={inputValue}
               onChange={setInputValue}
               onSubmit={handleSubmit}
-              disabled={flipped}
+              disabled={flipped || showAnswerAfterWrong}
               user={user}
               onPeek={handlePeek}
               flipped={flipped}

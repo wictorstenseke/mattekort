@@ -7,6 +7,8 @@ interface NumericKeypadProps {
   onSubmit: () => void
   disabled?: boolean
   user: string
+  onPeek?: () => void
+  flipped?: boolean
 }
 
 const KEYS = [
@@ -18,9 +20,10 @@ const KEYS = [
 
 const HAND_PREF_KEY = 'handedness'
 
-export function NumericKeypad({ value, onChange, onSubmit, disabled, user }: NumericKeypadProps) {
+export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPeek, flipped }: NumericKeypadProps) {
   const [pressedKey, setPressedKey] = useState<string | null>(null)
   const [rightHanded, setRightHanded] = useState(true)
+  const [isSwitching, setIsSwitching] = useState(false)
 
   // Load persisted handedness preference
   useEffect(() => {
@@ -31,6 +34,8 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user }: Num
   }, [user])
 
   const toggleHand = useCallback(() => {
+    setIsSwitching(true)
+    setTimeout(() => setIsSwitching(false), 400)
     setRightHanded(prev => {
       const next = !prev
       setPreference(user, HAND_PREF_KEY, next ? 'right' : 'left')
@@ -57,15 +62,7 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user }: Num
   }, [value, onChange, onSubmit, disabled])
 
   return (
-    <div class={`keypad-wrapper${rightHanded ? ' right-handed' : ' left-handed'}`}>
-      <button
-        type="button"
-        class="hand-toggle"
-        onClick={toggleHand}
-        aria-label={rightHanded ? 'Flytta till vänster' : 'Flytta till höger'}
-      >
-        {rightHanded ? '👈' : '👉'}
-      </button>
+    <div class={`keypad-wrapper${rightHanded ? ' right-handed' : ' left-handed'}${isSwitching ? ' switching' : ''}`}>
       <div class="keypad-grid">
         {KEYS.map((row, ri) =>
           row.map((key) => {
@@ -83,6 +80,24 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user }: Num
             )
           })
         )}
+      </div>
+      <div class="keypad-toggle-separator" />
+      <div class="keypad-toggle-row">
+        {onPeek && !flipped && (
+          <button type="button" class="btn-peek" onClick={onPeek} aria-label="Titta på svaret">
+            <span class="btn-icon">👀</span>
+            <span class="btn-text">Kolla svar</span>
+          </button>
+        )}
+        <button
+          type="button"
+          class="hand-toggle"
+          onClick={toggleHand}
+          aria-label={rightHanded ? 'Flytta till vänster' : 'Flytta till höger'}
+        >
+          <span class="btn-icon">⌨️</span>
+          <span class="btn-text">Byt sida</span>
+        </button>
       </div>
     </div>
   )

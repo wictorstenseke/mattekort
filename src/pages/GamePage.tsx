@@ -109,7 +109,6 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
 
   const question = `${gameState.table} × ${current.n}`
   const answer = gameState.table * current.n
-  const answerDisplayValue = inputValue || '?'
   const answerDisplayClass = `answer-display${answerState !== 'idle' ? ` ${answerState}` : ''}`
 
   return (
@@ -120,48 +119,52 @@ export function GamePage({ table, user, onBack, onComplete }: GamePageProps) {
         <div class="progress-text">{done}/{total}</div>
       </div>
 
-      <div class="game-layout">
-        <div class="game-card-col">
-          <div class="piles-bar">
-            <div class="pile-box deck-pile">
-              <div class="pile-count">{deck.length}</div>
-              <div class="pile-label">Kort kvar</div>
+      <div class="game-content">
+        <div class="game-layout">
+          <div class="game-card-col">
+            <div class="piles-bar">
+              <div class="pile-box deck-pile">
+                <div class="pile-count">{deck.length}</div>
+                <div class="pile-label">Kort kvar</div>
+              </div>
+              <div class="pile-box clear-pile">
+                <div class="pile-count">{clearPile.length}</div>
+                <div class="pile-label">Klara</div>
+              </div>
+              <div class="pile-box retry-pile">
+                <div class="pile-count">{retryPile.length}</div>
+                <div class="pile-label">Öva igen</div>
+              </div>
             </div>
-            <div class="pile-box clear-pile">
-              <div class="pile-count">{clearPile.length}</div>
-              <div class="pile-label">Klara</div>
+
+            <div class="card-area" key={cardKey}>
+              <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}${answerState === 'correct' ? ' correct' : ''}`}>
+                <div class="card-face card-front">
+                  <div class="card-question">{question}</div>
+                </div>
+                <div class="card-face card-back">
+                  <div class="card-answer">{answer}</div>
+                  <div class="card-answer-label">{question} = {answer}</div>
+                </div>
+              </div>
             </div>
-            <div class="pile-box retry-pile">
-              <div class="pile-count">{retryPile.length}</div>
-              <div class="pile-label">Öva igen</div>
+
+            <div class={answerDisplayClass}>
+              {inputValue || <span class="answer-placeholder">Skriv ditt svar</span>}
             </div>
           </div>
 
-          <div class="card-area" key={cardKey}>
-            <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}`}>
-              <div class="card-face card-front">
-                <div class="card-question">{question}</div>
-                <div class="card-hint">Skriv ditt svar ↓</div>
-              </div>
-              <div class="card-face card-back">
-                <div class="card-answer">{answer}</div>
-                <div class="card-answer-label">{question} = {answer}</div>
-              </div>
-            </div>
+          <div class="game-keypad-col">
+            <NumericKeypad
+              value={inputValue}
+              onChange={setInputValue}
+              onSubmit={handleSubmit}
+              disabled={flipped}
+              user={user}
+              onPeek={handlePeek}
+              flipped={flipped}
+            />
           </div>
-
-          <div class={answerDisplayClass}>{answerDisplayValue}</div>
-        </div>
-
-        <div class="game-keypad-col">
-          <button type="button" class="btn-peek" onClick={handlePeek}>👀 Titta</button>
-          <NumericKeypad
-            value={inputValue}
-            onChange={setInputValue}
-            onSubmit={handleSubmit}
-            disabled={flipped}
-            user={user}
-          />
         </div>
       </div>
     </div>

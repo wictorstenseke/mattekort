@@ -45,7 +45,7 @@ body::before {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* LOGIN */
@@ -363,6 +363,15 @@ body::before {
   color: #aaa;
 }
 
+.game-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 16px;
+}
+
 /* Layout: portrait (default) — card on top, keypad below */
 .game-layout {
   display: flex;
@@ -437,15 +446,15 @@ body::before {
   perspective: 1200px;
   margin-bottom: 16px;
   animation: cardIn .4s cubic-bezier(.34, 1.56, .64, 1);
+  width: 100%;
 }
 
 .flashcard {
-  width: 320px;
+  width: 100%;
   height: 220px;
   position: relative;
   transform-style: preserve-3d;
   transition: transform .55s cubic-bezier(.4, 0, .2, 1);
-  cursor: pointer;
 }
 
 .flashcard.flipped {
@@ -500,6 +509,14 @@ body::before {
   margin-top: 4px;
 }
 
+.flashcard.correct .card-back .card-answer {
+  font-size: 5rem;
+}
+
+.flashcard.correct .card-back .card-answer-label {
+  font-size: 1.2rem;
+}
+
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   20% { transform: translateX(-10px); }
@@ -516,15 +533,19 @@ body::before {
 .answer-display {
   font-family: 'Fredoka One', cursive;
   font-size: 2rem;
+  line-height: 1;
   text-align: center;
   padding: 14px 24px;
   border: 3px solid #eee;
   border-radius: 16px;
   background: white;
   width: 100%;
-  max-width: 320px;
   color: #333;
-  min-height: 60px;
+  height: 66px;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: border-color .2s, background .2s, transform .15s;
 }
 
@@ -538,23 +559,44 @@ body::before {
   background: #FFEAEA;
 }
 
-.btn-peek {
-  width: 100%;
-  padding: 14px;
-  background: white;
-  border: 3px solid #eee;
-  border-radius: 14px;
+.answer-placeholder {
   font-family: 'Nunito', sans-serif;
-  font-weight: 800;
-  font-size: .95rem;
-  cursor: pointer;
-  color: #999;
-  transition: all .2s;
+  font-size: 1.1rem;
+  color: #bbb;
+  text-align: center;
+  display: block;
 }
 
-.btn-peek:hover {
-  border-color: var(--tc);
-  color: var(--tc);
+.btn-peek,
+.hand-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 2px solid #eee;
+  border-radius: 12px;
+  background: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+  transition: border-color .2s, transform .2s;
+  touch-action: manipulation;
+}
+
+.btn-peek .btn-icon,
+.hand-toggle .btn-icon {
+  font-size: 1.2rem;
+}
+
+.btn-peek:hover,
+.hand-toggle:hover {
+  transform: scale(1.02);
 }
 
 /* NUMERIC KEYPAD */
@@ -584,7 +626,11 @@ body::before {
   user-select: none;
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+
+.keypad-key:focus { outline: none; }
+.keypad-key:focus-visible { outline: 2px solid var(--tc); }
 
 .keypad-key.key-digit {
   background: white;
@@ -592,8 +638,10 @@ body::before {
   box-shadow: 0 3px 10px rgba(0, 0, 0, .08);
 }
 
-.keypad-key.key-digit:hover {
-  background: #f5f5f5;
+@media (hover: hover) {
+  .keypad-key.key-digit:hover {
+    background: #f5f5f5;
+  }
 }
 
 .keypad-key.key-digit.pressed {
@@ -623,28 +671,28 @@ body::before {
   box-shadow: 0 1px 6px rgba(0, 0, 0, .15);
 }
 
-/* Handedness toggle — hidden in portrait by default */
-.hand-toggle {
-  display: none;
-  position: absolute;
-  top: -48px;
-  right: 4px;
-  background: white;
-  border: 2px solid #eee;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
-  transition: transform .2s;
-  z-index: 2;
-  align-items: center;
-  justify-content: center;
+
+.keypad-toggle-separator {
+  height: 1px;
+  background: rgba(0, 0, 0, .08);
+  margin: 12px 0;
 }
 
-.hand-toggle:hover {
-  transform: scale(1.1);
+.keypad-toggle-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+@keyframes keypadSwitch {
+  0%   { opacity: 1; transform: scale(1); }
+  40%  { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.keypad-wrapper.switching {
+  animation: keypadSwitch 0.4s ease;
 }
 
 /* Landscape layout */
@@ -685,12 +733,7 @@ body::before {
   }
 
   .flashcard {
-    width: 280px;
-    height: 190px;
-  }
-
-  .hand-toggle {
-    display: flex;
+    height: 240px;
   }
 
   /* Right-handed: keypad on the right (default) */
@@ -991,4 +1034,72 @@ body::before {
 @keyframes floatUp {
   0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
   100% { opacity: 0; transform: translateX(-50%) translateY(-80px) scale(1.3); }
+}
+
+@media (max-width: 640px) {
+  .game-screen {
+    padding: 12px 16px 16px;
+  }
+
+  .game-header {
+    margin-bottom: 10px;
+  }
+
+  .game-title {
+    font-size: 1.2rem;
+  }
+
+  .game-layout {
+    gap: 10px;
+  }
+
+  .piles-bar {
+    margin-bottom: 10px;
+    gap: 8px;
+  }
+
+  .pile-box {
+    padding: 8px 10px;
+  }
+
+  .pile-box .pile-count {
+    font-size: 1.4rem;
+  }
+
+  .flashcard {
+    height: 160px;
+  }
+
+  .card-question {
+    font-size: 2.2rem;
+  }
+
+  .card-area {
+    margin-bottom: 8px;
+  }
+
+  .hand-toggle {
+    display: none;
+  }
+
+  .answer-display {
+    font-size: 1.6rem;
+    line-height: 1;
+    padding: 10px 16px;
+    height: 52px;
+    min-height: 52px;
+  }
+
+  .game-content {
+    padding-bottom: 8px;
+  }
+
+  .keypad-key {
+    min-height: 48px;
+    font-size: 1.3rem;
+  }
+
+  .keypad-grid {
+    gap: 6px;
+  }
 }

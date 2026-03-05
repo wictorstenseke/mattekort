@@ -1,4 +1,4 @@
-import { localStorageAdapter } from './storage.local'
+import { firebaseStorageAdapter } from './storage.firebase'
 import type { StorageAdapter } from './storage'
 
-export const storage: StorageAdapter = localStorageAdapter
+export const storage: StorageAdapter = firebaseStorageAdapter

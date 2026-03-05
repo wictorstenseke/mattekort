@@ -17,6 +17,9 @@
     "firebase": "^12.10.0",
     "preact": "^10.27.2"
   },
+  "overrides": {
+    "serialize-javascript": ">=7.0.3"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@preact/preset-vite": "^2.10.2",

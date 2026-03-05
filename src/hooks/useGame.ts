@@ -48,6 +48,7 @@ export function useGame(username: string) {
   const [gameState, setGameState] = useState<GameState>(initialState)
   const [roundResult, setRoundResult] = useState<RoundResult | null>(null)
   const gsRef = useRef<GameState>(initialState)
+  const savedTdRef = useRef<TableData>({ wins: 0, clear: [], retry: [] })
 
   // Keep ref in sync for use inside timeouts
   const updateState = useCallback((updater: (prev: GameState) => GameState) => {
@@ -73,6 +74,8 @@ export function useGame(username: string) {
       const resetTd: TableData = { wins: td.wins, clear: [], retry: [] }
       await storage.saveTableData(username, table, resetTd)
     }
+
+    savedTdRef.current = td
 
     const current = pickRandom(deck)
     const newState: GameState = {
@@ -112,6 +115,11 @@ export function useGame(username: string) {
     })
   }, [username])
 
+  const backgroundSave = useCallback((clearPile: number[], retryPile: number[]) => {
+    const { newClear, newRetry, wins } = computeEndRound(savedTdRef.current, clearPile, retryPile)
+    void storage.saveTableData(username, gsRef.current.table, { wins, clear: newClear, retry: newRetry })
+  }, [username])
+
   const moveCard = useCallback((correct: boolean): void => {
     const gs = gsRef.current
     if (!gs.current) return
@@ -143,10 +151,11 @@ export function useGame(username: string) {
       return
     }
 
+    backgroundSave(newClear, newRetry)
     const withNext = nextCard(updated)
     gsRef.current = withNext
     setGameState(withNext)
-  }, [endRound])
+  }, [endRound, backgroundSave])
 
   const submitAnswer = useCallback((value: number): 'correct' | 'wrong' | 'invalid' => {
     const gs = gsRef.current

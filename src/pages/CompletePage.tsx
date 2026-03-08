@@ -1,5 +1,22 @@
-import { useEffect, useRef } from 'preact/hooks'
+import { useEffect, useRef, useState } from 'preact/hooks'
 import type { RoundResult } from '../hooks/useGame'
+import { buildEmbedUrl, pickRandomVideoId } from '../lib/youtube'
+
+declare global {
+  interface Window {
+    YT: {
+      Player: new (
+        elementId: string,
+        options: {
+          events?: {
+            onStateChange?: (event: { data: number }) => void
+          }
+        }
+      ) => { destroy(): void }
+    }
+    onYouTubeIframeAPIReady: (() => void) | undefined
+  }
+}
 
 interface CompletePageProps {
   result: RoundResult
@@ -56,16 +73,85 @@ function getReaction(allClear: boolean, clearCount: number, retryCount: number):
   return encourage[Math.floor(Math.random() * encourage.length)]
 }
 
+function loadYouTubeApi(onReady: () => void) {
+  if (window.YT && window.YT.Player) {
+    onReady()
+    return
+  }
+  const prev = window.onYouTubeIframeAPIReady
+  window.onYouTubeIframeAPIReady = () => {
+    if (prev) prev()
+    onReady()
+  }
+  if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+    const script = document.createElement('script')
+    script.src = 'https://www.youtube.com/iframe_api'
+    document.head.appendChild(script)
+  }
+}
+
 export function CompletePage({ result, onContinue, onBack }: CompletePageProps) {
   const { clearCount, retryCount, allClear, table, wins } = result
   const confettiRef = useRef<HTMLDivElement>(null)
   const reaction = getReaction(allClear, clearCount, retryCount)
+
+  const [showVideo, setShowVideo] = useState(false)
+  const [videoId] = useState(() => pickRandomVideoId())
+  const [videoEnded, setVideoEnded] = useState(false)
 
   useEffect(() => {
     if (confettiRef.current && (allClear || retryCount === 0)) {
       spawnConfetti(confettiRef.current)
     }
   }, [allClear, retryCount])
+
+  useEffect(() => {
+    if (!showVideo) return
+    let player: { destroy(): void } | null = null
+
+    loadYouTubeApi(() => {
+      player = new window.YT.Player('yt-reward-player', {
+        events: {
+          onStateChange: (event: { data: number }) => {
+            if (event.data === 0) setVideoEnded(true)
+          },
+        },
+      })
+    })
+
+    return () => {
+      player?.destroy()
+    }
+  }, [showVideo])
+
+  if (showVideo) {
+    return (
+      <div class="screen active video-reward-screen">
+        <div class="video-reward-wrap">
+          <div class="yt-iframe-wrap">
+            <iframe
+              id="yt-reward-player"
+              src={buildEmbedUrl(videoId)}
+              title="Belöningsvideo"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowFullScreen
+              frameBorder="0"
+              class="yt-iframe"
+            />
+            {videoEnded && (
+              <div class="yt-ended-overlay">
+                <span class="yt-ended-emoji">🎬</span>
+                <p class="yt-ended-msg">Video klart!</p>
+              </div>
+            )}
+          </div>
+          <button class="btn-secondary video-back-btn" onClick={onBack}>
+            ← Tillbaka till tabellerna
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div class="screen active complete-screen">
@@ -96,6 +182,11 @@ export function CompletePage({ result, onContinue, onBack }: CompletePageProps) 
           <button class="btn-primary" onClick={onContinue}>
             {allClear ? 'Spela igen! 🎮' : 'Fortsätt öva! 📚'}
           </button>
+          {allClear && (
+            <button class="btn-video-reward" onClick={() => setShowVideo(true)}>
+              🎬 Se en belöningsvideo!
+            </button>
+          )}
           <button class="btn-secondary" onClick={onBack}>
             ← Tillbaka till tabellerna
           </button>

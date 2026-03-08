@@ -1313,6 +1313,98 @@ img.login-emoji {
   background: #f8f8f8;
 }
 
+/* VIDEO REWARD BUTTON */
+.btn-video-reward {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #C77DFF, #4D96FF);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 6px 20px rgba(199, 125, 255, 0.4);
+  touch-action: manipulation;
+  min-height: 56px;
+}
+
+.btn-video-reward:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(199, 125, 255, 0.5);
+}
+
+.btn-video-reward:active {
+  transform: scale(.97) translateY(0);
+  box-shadow: 0 3px 10px rgba(199, 125, 255, 0.4);
+}
+
+/* VIDEO REWARD SCREEN */
+.video-reward-screen {
+  background: #0d0d0d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.video-reward-wrap {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.yt-iframe-wrap {
+  position: relative;
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 */
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.yt-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.yt-ended-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 10;
+}
+
+.yt-ended-emoji {
+  font-size: 3rem;
+}
+
+.yt-ended-msg {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  color: white;
+  margin: 0;
+}
+
+.video-back-btn {
+  margin-top: 20px;
+  min-height: 56px;
+  font-size: 1.1rem;
+}
+
 /* ANIMATIONS */
 @keyframes popIn {
   from { opacity: 0; transform: scale(.85); }

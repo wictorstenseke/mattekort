@@ -107,7 +107,7 @@ export function CompletePage({ result, onContinue, onBack }: CompletePageProps) 
 
   useEffect(() => {
     if (!showVideo) return
-    let player: ReturnType<typeof window.YT.Player> | null = null
+    let player: { destroy(): void } | null = null
 
     loadYouTubeApi(() => {
       player = new window.YT.Player('yt-reward-player', {

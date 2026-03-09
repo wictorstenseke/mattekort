@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, fireEvent, cleanup } from '@testing-library/preact'
 import { NumericKeypad } from './NumericKeypad'
 
-const mockGetPreference = vi.fn(() => null)
-const mockSetPreference = vi.fn()
+const { mockGetPreference, mockSetPreference } = vi.hoisted(() => ({
+  mockGetPreference: vi.fn(() => null),
+  mockSetPreference: vi.fn(),
+}))
 
 vi.mock('../lib/preferences', () => ({
-  getPreference: (...args: unknown[]) => mockGetPreference(...args),
-  setPreference: (...args: unknown[]) => mockSetPreference(...args),
+  getPreference: mockGetPreference,
+  setPreference: mockSetPreference,
 }))
 
 describe('NumericKeypad', () => {

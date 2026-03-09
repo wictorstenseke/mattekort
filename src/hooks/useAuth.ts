@@ -26,6 +26,9 @@ export function useAuth() {
     if (!trimmed) {
       return { success: false, error: 'Skriv ett användarnamn!' }
     }
+    if (/\s/.test(trimmed)) {
+      return { success: false, error: 'Användarnamnet får inte innehålla mellanslag' }
+    }
     if (!/^\d{4}$/.test(pin)) {
       return { success: false, error: 'Koden måste vara 4 siffror!' }
     }
@@ -36,7 +39,7 @@ export function useAuth() {
       const code = (err as { code?: string }).code
       if (code === 'auth/email-already-in-use') {
         const valid = await storage.validatePin(trimmed, pin)
-        if (!valid) return { success: false, error: 'Fel kod! Försök igen 🔒' }
+        if (!valid) return { success: false, error: 'Användarnamnet är upptaget. Skriv din kod om det är ditt konto, annars välj ett annat namn.' }
       } else if (code === 'auth/network-request-failed') {
         return { success: false, error: 'Ingen nätverksanslutning. Försök igen!' }
       } else if (code === 'auth/too-many-requests') {

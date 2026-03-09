@@ -125,6 +125,14 @@ describe('useAuth', () => {
       unmount()
     })
 
+    it('rejects username with spaces', async () => {
+      const { result, unmount } = await renderHookCustom(() => useAuth())
+      const res = await result.current.login('wictor sten', '1234')
+      expect(res.success).toBe(false)
+      expect(res.error).toContain('mellanslag')
+      unmount()
+    })
+
     it('rejects non-4-digit PIN', async () => {
       const { result, unmount } = await renderHookCustom(() => useAuth())
       const res1 = await result.current.login('alice', '123')
@@ -181,7 +189,7 @@ describe('useAuth', () => {
 
       const res = await result.current.login('alice', '9999')
       expect(res.success).toBe(false)
-      expect(res.error).toBeTruthy()
+      expect(res.error).toContain('upptaget')
       unmount()
     })
   })

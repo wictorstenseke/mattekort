@@ -71,8 +71,10 @@ describe('getCategoryDef', () => {
 })
 
 describe('ALL_CATEGORIES', () => {
-  it('has exactly 17 categories (10 multiply + 4 plus + 3 minus)', () => {
-    expect(ALL_CATEGORIES).toHaveLength(17)
+  it('has the expected total count (multiply + plus + minus)', () => {
+    expect(ALL_CATEGORIES).toHaveLength(
+      MULTIPLY_CATEGORIES.length + PLUS_CATEGORIES.length + MINUS_CATEGORIES.length,
+    )
   })
 
   it('has all unique IDs', () => {

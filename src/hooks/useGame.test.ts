@@ -102,8 +102,7 @@ describe('useGame', () => {
         await result.current.startGame(3)
       })
 
-      // Should have fewer than 10 cards since 3 are cleared
-      // 1 retry + 6 remaining = 7 cards in deck (current is one of them)
+      // 10 total - 3 cleared = 7 cards in deck (current is one of them)
       expect(result.current.gameState.deck).toHaveLength(7)
       unmount()
     })
@@ -267,14 +266,14 @@ describe('useGame', () => {
         await result.current.startGame(3)
       })
 
-      // Make busy
+      // Make busy via correct answer
       const card = result.current.gameState.current!
       await act(() => { result.current.submitAnswer(3 * card.n) })
       expect(result.current.gameState.busy).toBe(true)
+      expect(result.current.gameState.peeked).toBe(false)
 
-      // peek should not change peeked
+      // peek should be ignored while busy — peeked stays false
       await act(() => { result.current.peekCard() })
-      // peeked should still be false (from submitAnswer, not from peek)
       expect(result.current.gameState.peeked).toBe(false)
       unmount()
     })

@@ -56,13 +56,6 @@
   --dot3: #6BCB7733;
 }
 
-[data-theme="dark"] .game-header .back-chip:first-of-type,
-[data-theme="dark"] .stats-header .back-chip:first-of-type {
-  background: #8a8a95;
-  color: #e8e8ed;
-  border-color: #9a9aa5;
-}
-
 [data-theme="dark"] {
   --bg: #1a1a1f;
   --surface: #252530;

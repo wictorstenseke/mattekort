@@ -193,7 +193,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
         equations={Array.from(gameState.equations.values())}
       />
       <div class="game-header w-full max-w-[480px] flex items-center mb-5 flex-wrap gap-3 md:gap-4 max-sm:mb-2.5">
-        <button type="button" class="back-chip" onClick={handleBack} aria-label="Tillbaka">🔙</button>
+        <button type="button" class="back-chip" onClick={handleBack} aria-label="Tillbaka">Tillbaka</button>
         <div class="game-title font-[Fredoka_One] text-2xl max-sm:text-xl text-[var(--text)] flex-1">{catDef?.label ?? `Kategori ${categoryId}`}</div>
         <div class="font-extrabold text-[.85rem] text-[var(--text-muted)]">{done}/{total}</div>
         <ThemeToggle />

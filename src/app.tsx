@@ -14,7 +14,7 @@ type Screen = 'login' | 'home' | 'game' | 'complete' | 'stats'
 function ScreenFallback() {
   return (
     <div class="screen active auth-loading">
-      <div class="font-[Nunito] text-[1.1rem] text-[var(--text-muted)]">Laddar...</div>
+      <div class="font-[Nunito] text-[1.1rem] text-(--text-muted)">Laddar...</div>
     </div>
   )
 }

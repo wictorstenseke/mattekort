@@ -77,7 +77,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats }: HomePagePro
               <button
                 key={tab.op}
                 type="button"
-                class={`py-1.5 px-5 min-h-9 border-2 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,.08)] transition-[background,color,border-color] duration-200 touch-manipulation ${active ? 'text-white border-transparent shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-[var(--border)] bg-[var(--surface)] text-[var(--text-secondary)]'}`}
+                class={`py-1.5 px-5 max-sm:portrait:px-3 min-h-9 border-2 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,.08)] transition-[background,color,border-color] duration-200 touch-manipulation ${active ? 'text-white border-transparent shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-(--border) bg-(--surface) text-(--text-secondary)'}`}
                 style={active ? `background:${tab.gradient}` : ''}
                 onClick={() => handleTabChange(tab.op)}
               >
@@ -105,21 +105,21 @@ export function HomePage({ user, onSelectTable, onLogout, onStats }: HomePagePro
                 {activeOp === 'multiply' ? (
                   <>
                     <div class="table-num">{cat.id}</div>
-                    <div class="text-[.8rem] font-bold text-[var(--text-muted)] uppercase tracking-[.08em] mb-3">{cat.label}</div>
+                    <div class="text-[.8rem] font-bold text-(--text-muted) uppercase tracking-[.08em] mb-3">{cat.label}</div>
                   </>
                 ) : (
                   <>
                     <div class="text-[2.4rem] leading-none mb-1.5 block">{cat.emoji}</div>
-                    <div class="text-[.8rem] font-bold text-[var(--text-muted)] uppercase tracking-[.08em] mb-3">{cat.label}</div>
+                    <div class="text-[.8rem] font-bold text-(--text-muted) uppercase tracking-[.08em] mb-3">{cat.label}</div>
                   </>
                 )}
-                <div class="bg-[var(--progress-bg)] rounded-lg h-2 overflow-hidden mb-2">
+                <div class="bg-(--progress-bg) rounded-lg h-2 overflow-hidden mb-2">
                   <div class="progress-bar-fill" style={`transform:scaleX(${pct / 100})`} />
                 </div>
                 <div class="flex justify-center gap-2 flex-wrap mt-auto">
-                  <span class="flex items-center gap-0.5 text-xs font-extrabold py-0.5 px-2.5 rounded-full bg-[var(--success-bg)] text-[var(--success)]">✅ {clearN}/10</span>
-                  {retryN > 0 && <span class="flex items-center gap-0.5 text-xs font-extrabold py-0.5 px-2.5 rounded-full bg-[var(--warning-bg)] text-[var(--warning)]">🔄 {retryN}</span>}
-                  {td.wins > 0 && <span class="flex items-center gap-0.5 text-xs font-extrabold py-0.5 px-2.5 rounded-full bg-[var(--info-bg)] text-[var(--info)]">🏆 {td.wins}×</span>}
+                  <span class="flex items-center gap-0.5 text-xs font-extrabold py-0.5 px-2.5 rounded-full bg-(--success-bg) text-(--success)">✅ {clearN}/10</span>
+                  {retryN > 0 && <span class="flex items-center gap-0.5 text-xs font-extrabold py-0.5 px-2.5 rounded-full bg-(--warning-bg) text-(--warning)">🔄 {retryN}</span>}
+                  {td.wins > 0 && <span class="flex items-center gap-0.5 text-xs font-extrabold py-0.5 px-2.5 rounded-full bg-(--info-bg) text-(--info)">🏆 {td.wins}×</span>}
                 </div>
               </div>
             )

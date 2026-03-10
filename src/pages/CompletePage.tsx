@@ -182,11 +182,11 @@ export function CompletePage({ result, onContinue, onBack }: CompletePageProps) 
         )}
 
         <div class="flex justify-center gap-5 mb-8">
-          <div class="text-center text-[var(--success)]">
+          <div class="text-center text-(--success)">
             <div class="cstat-num">{clearCount}</div>
             <div class="cstat-label">Klara</div>
           </div>
-          <div class="text-center text-[var(--warning)]">
+          <div class="text-center text-(--warning)">
             <div class="cstat-num">{retryCount}</div>
             <div class="cstat-label">Öva igen</div>
           </div>

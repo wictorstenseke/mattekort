@@ -127,7 +127,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
       <div class="screen active stats-screen">
         <div class="w-full max-w-[900px] flex items-center mb-4 flex-wrap gap-3 md:gap-4">
           <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">Tillbaka</button>
-          <h1 class="font-[Fredoka_One] text-2xl text-[var(--text-secondary)] flex-1">Statistik</h1>
+          <h1 class="font-[Fredoka_One] text-2xl text-(--text-secondary) flex-1 max-sm:portrait:text-center">Statistik</h1>
         </div>
         <p class="stats-empty">Kunde inte ladda statistiken. Försök igen!</p>
       </div>
@@ -151,7 +151,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
     <div class="screen active stats-screen">
       <div class="w-full max-w-[900px] flex items-center mb-4 flex-wrap gap-3 md:gap-4">
         <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">Tillbaka</button>
-        <h1 class="font-[Fredoka_One] text-2xl text-[var(--text-secondary)] flex-1">Statistik</h1>
+        <h1 class="font-[Fredoka_One] text-2xl text-(--text-secondary) flex-1 max-sm:portrait:text-center">Statistik</h1>
         <ThemeToggle />
         <button type="button" class="back-chip" onClick={() => setShowHistory(true)}>
           📋 Historik
@@ -160,7 +160,7 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
 
       <div class="w-full max-w-[900px]">
         {!hasData ? (
-          <p class="text-[var(--text-muted)]">Ingen data ännu! Spela lite först 🎮</p>
+          <p class="text-(--text-muted)">Ingen data ännu! Spela lite först 🎮</p>
         ) : (
             <div class="stats-layout-experimental">
               <div class="stats-sidebar flex flex-col gap-3">

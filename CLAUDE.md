@@ -17,7 +17,7 @@ npm run test:watch # Watch mode for tests
 
 - **UI**: Preact with functional components and hooks
 - **Styling**: Tailwind CSS v4 — use utility classes, no custom CSS unless necessary
-- **State**: Local component state + custom hooks (`useGame`, `useAuth`)
+- **State**: Local component state + custom hooks (`useGame`, `useAuth`, `useTheme`)
 - **Storage**: Always use the `storage` export from `src/lib/storageContext.ts` — never access `localStorage` directly in components or hooks
 
 ## Key Constraints
@@ -27,6 +27,7 @@ npm run test:watch # Watch mode for tests
 - **Peek = retry**: Any card peek must move the card to the retry pile — this is a core game rule
 - **Auto-flip**: After 2+ wrong answers on a card, flip and show answer automatically (12s timer in GamePage)
 - **Keypad**: `NumericKeypad` supports left/right-handed mode, persisted via `preferences.ts` — max 3 digits input
+- **Theming**: Use CSS custom properties (`--bg`, `--surface`, `--text`, `--tc`, `--tc2`, etc.) for all theme-aware colors — never hardcode light/dark color values. Theme state lives in `useTheme` and is stored in `localStorage`.
 
 ## Firebase
 
@@ -51,6 +52,6 @@ npm run test:watch # Watch mode for tests
 ## App Branding
 
 - App name: **Räkneresan** (Swedish: "The Math Journey")
-- Tables 1–10 (multiplication tables), each with a unique color + emoji
+- 23 categories across 3 operations: **multiply** (tables 1–10, each with unique color + emoji), **add** (Tiokompisar, Dubbelkompisar, Plus till 20, Lätt hundra), **subtract** (Minuskompisar till 10, Minus inom 20, Lätt hundra minus)
 - Auth uses fake email domain: `username@matte.kort`
-- Screen flow: Login → Home → Game → Complete → (back to Home or replay)
+- Screen flow: Login → Home → Game → Complete → (back to Home or replay); Home also provides access to Stats

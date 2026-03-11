@@ -87,7 +87,8 @@ describe('App', () => {
       login: vi.fn(),
       logout,
     })
-    const { getByText } = render(<App />)
+    const { getByLabelText, getByText } = render(<App />)
+    fireEvent.click(getByLabelText('Öppna meny'))
     fireEvent.click(getByText(/Logga ut/))
     expect(logout).toHaveBeenCalled()
   })

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'preact/hooks'
 import { ThemeToggle } from '../components/ThemeToggle'
+import { TopHeader } from '../components/TopHeader'
 import { getCategoryDef } from '../lib/constants'
 import { useGame } from '../hooks/useGame'
 import { NumericKeypad } from '../components/NumericKeypad'
@@ -214,15 +215,15 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
         tableColor={tableColor}
         equations={Array.from(gameState.equations.values())}
       />
-      <div class="game-header w-full max-w-[480px] flex items-center mb-5 flex-wrap gap-3 md:gap-4 max-sm:mb-2.5">
-        <button type="button" class="back-chip" onClick={handleBack} aria-label="Tillbaka">Tillbaka</button>
-        <div class="game-title font-[Fredoka_One] text-2xl max-sm:text-xl text-(--text) flex-1">{catDef?.label ?? `Kategori ${categoryId}`}</div>
+      <TopHeader showBack onBack={handleBack} maxWidth="900px">
         <div class="font-extrabold text-[.85rem] text-(--text-muted)">{done}/{total}</div>
         <ThemeToggle />
-      </div>
+      </TopHeader>
+
+      <h1 class="page-title w-full max-w-[900px] font-[Fredoka_One] text-2xl max-sm:text-xl text-(--text) mb-5 max-sm:mb-2.5">{catDef?.label ?? `Kategori ${categoryId}`}</h1>
 
       <div class="game-content flex-1 flex items-center justify-center w-full pb-4 max-sm:pb-2">
-        <div class="game-layout flex flex-col items-center gap-4 w-full max-w-[480px] max-sm:gap-2.5">
+        <div class="game-layout flex flex-col items-center gap-4 w-full max-w-[900px] max-sm:gap-2.5">
           <div class="flex flex-col items-center w-full">
             <div class="piles-bar">
               <div class="pile-box deck-pile">

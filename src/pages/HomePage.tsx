@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'preact/hooks'
-import { ThemeToggle } from '../components/ThemeToggle'
+import { BalanceChip } from '../components/BalanceChip'
+import { UserMenuChip } from '../components/UserMenuChip'
 import { MULTIPLY_CATEGORIES, PLUS_CATEGORIES, MINUS_CATEGORIES } from '../lib/constants'
 import type { Operation, CategoryDef } from '../lib/constants'
 import { storage } from '../lib/storageContext'
@@ -62,18 +63,15 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
 
   return (
     <div class="screen active home-screen">
-      <div class="top-bar flex flex-col gap-4 items-center md:flex-row md:justify-between md:items-center">
-        <h1 class="text-center">🎯 Räkneresan</h1>
-        <div class="top-bar-actions flex flex-wrap justify-center gap-2.5 md:flex-nowrap md:justify-end">
-          <ThemeToggle />
-          <span class="balance-chip balance-credits" title="Dina poäng">💰 {credits}</span>
-          <span class="balance-chip balance-savers" title="Dina Peek Savers">🛡️ {peekSavers}</span>
-          <button class="stats-chip" onClick={onShop}>🛍️ Butiken</button>
-          <button class="stats-chip" onClick={onStats}>📊 Statistik</button>
-          <button type="button" class="user-chip" onClick={onLogout}>
-            🚪 Logga ut
-          </button>
+      <div class="top-bar flex flex-col min-[570px]:flex-row min-[570px]:items-center min-[570px]:justify-between gap-1 min-[570px]:gap-3">
+        <div class="flex justify-end min-[570px]:order-2">
+          <div class="top-bar-actions flex items-center gap-2">
+            <BalanceChip type="credits" count={credits} onShopClick={onShop} />
+            <BalanceChip type="savers" count={peekSavers} onShopClick={onShop} />
+            <UserMenuChip user={user} onHome={() => {}} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="home" />
+          </div>
         </div>
+        <h1 class="text-center min-[570px]:text-left min-[570px]:order-1 mt-6 min-[570px]:mt-0">🎯 Räkneresan</h1>
       </div>
 
       <div class="flex-1 flex flex-col justify-center w-full max-w-[900px] max-sm:portrait:justify-start gap-6">
@@ -85,7 +83,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
               <button
                 key={tab.op}
                 type="button"
-                class={`py-1.5 px-5 max-sm:portrait:px-3 min-h-9 border-2 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,.08)] transition-[background,color,border-color] duration-200 touch-manipulation ${active ? 'text-white border-transparent shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-(--border) bg-(--surface) text-(--text-secondary)'}`}
+                class={`op-tab py-1.5 px-5 max-sm:portrait:px-3 min-h-9 border-2 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,.08)] touch-manipulation ${active ? 'text-white border-transparent shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-(--border) bg-(--surface) text-(--text-secondary)'}`}
                 style={active ? `background:${tab.gradient}` : ''}
                 onClick={() => handleTabChange(tab.op)}
               >

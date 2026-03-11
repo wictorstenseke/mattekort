@@ -136,11 +136,11 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
             disabled={flipped}
             aria-label={peekConfirming ? 'Bekräfta titta på svaret' : 'Titta på svaret'}
           >
-            {!peekConfirming && <span class="btn-icon">{hasSavers ? '🛡️' : '👀'}</span>}
+            {!peekConfirming && <span class="btn-icon">👀</span>}
             <span class="btn-text">
               {peekConfirming
                 ? hasSavers ? `Använd saver? (${peekSavers}st)` : 'Säker? (Till öva igen)'
-                : hasSavers ? `Kolla svar  ×${peekSavers}` : 'Kolla svar'}
+                : hasSavers ? `Kolla svar (×${peekSavers})` : 'Kolla svar'}
             </span>
           </button>
         )}

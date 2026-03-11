@@ -39,8 +39,8 @@ export function App() {
     setScreen('home')
   }, [])
 
-  const handleLogout = useCallback(() => {
-    void logout()
+  const handleLogout = useCallback(async () => {
+    await logout()
     setScreen('login')
   }, [logout])
 
@@ -118,6 +118,9 @@ export function App() {
           <StatsPage
             user={currentUser!}
             onBack={goHome}
+            onStats={handleStats}
+            onShop={handleShop}
+            onLogout={handleLogout}
           />
         </Suspense>
       )
@@ -127,6 +130,8 @@ export function App() {
           <ShopPage
             user={currentUser!}
             onBack={goHome}
+            onStats={handleStats}
+            onLogout={handleLogout}
           />
         </Suspense>
       )

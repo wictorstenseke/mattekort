@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import type { RoundResult } from '../hooks/useGame'
-import { ThemeToggle } from '../components/ThemeToggle'
 import { getCategoryDef } from '../lib/constants'
 import { storage } from '../lib/storageContext'
 
@@ -79,34 +78,31 @@ export function CompletePage({ result, user, onContinue, onBack }: CompletePageP
   const handleChooseCredits = useCallback(() => {
     if (rewardChosen) return
     setRewardChosen(true)
-    storage.addCredits(user, 1)
-      .then(() => setRewardFeedback('💰 +1 poäng tillagd!'))
-      .catch(() => setRewardFeedback('💰 +1 poäng!'))
+    storage.addCredits(user, 4)
+      .then(() => setRewardFeedback('💰 +4 poäng tillagda!'))
+      .catch(() => setRewardFeedback('💰 +4 poäng!'))
   }, [rewardChosen, user])
 
   const handleChoosePeekSaver = useCallback(() => {
     if (rewardChosen) return
     setRewardChosen(true)
     storage.addPeekSavers(user, 1)
-      .then(() => setRewardFeedback('🛡️ +1 Peek Saver tillagd!'))
-      .catch(() => setRewardFeedback('🛡️ +1 Peek Saver!'))
+      .then(() => setRewardFeedback('👀 +1 Peek Saver tillagd!'))
+      .catch(() => setRewardFeedback('👀 +1 Peek Saver!'))
   }, [rewardChosen, user])
 
   const handleContinue = useCallback(() => {
-    if (!rewardChosen) storage.addCredits(user, 1)
+    if (!rewardChosen) storage.addCredits(user, 4)
     onContinue()
   }, [rewardChosen, user, onContinue])
 
   const handleBack = useCallback(() => {
-    if (!rewardChosen) storage.addCredits(user, 1)
+    if (!rewardChosen) storage.addCredits(user, 4)
     onBack()
   }, [rewardChosen, user, onBack])
 
   return (
     <div class="screen active complete-screen">
-      <div class="mb-3 flex justify-end w-full max-w-[420px]">
-        <ThemeToggle />
-      </div>
       <div class="confetti-container" ref={confettiRef} />
       <div class="complete-box">
         <span class="complete-emoji">{reaction.emoji}</span>
@@ -132,13 +128,13 @@ export function CompletePage({ result, user, onContinue, onBack }: CompletePageP
                   onClick={handleChooseCredits}
                 >
                   <span class="reward-choice-icon">💰</span>
-                  <span class="reward-choice-text">+1 Poäng</span>
+                  <span class="reward-choice-text">+4 Poäng</span>
                 </button>
                 <button
                   class="btn-reward-choice btn-reward-saver"
                   onClick={handleChoosePeekSaver}
                 >
-                  <span class="reward-choice-icon">🛡️</span>
+                  <span class="reward-choice-icon">👀</span>
                   <span class="reward-choice-text">+1 Peek Saver</span>
                 </button>
               </div>
@@ -151,7 +147,7 @@ export function CompletePage({ result, user, onContinue, onBack }: CompletePageP
             {allClear ? 'Spela igen! 🎮' : 'Fortsätt öva! 📚'}
           </button>
           <button class="back-chip w-full" onClick={handleBack}>
-            Tillbaka
+            🏠 Hem
           </button>
         </div>
       </div>

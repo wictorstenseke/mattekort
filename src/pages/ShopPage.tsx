@@ -1,11 +1,15 @@
-import { useCallback, useEffect, useState } from 'preact/hooks'
-import { ThemeToggle } from '../components/ThemeToggle'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
+import { BalanceChip } from '../components/BalanceChip'
+import { TopHeader } from '../components/TopHeader'
+import { UserMenuChip } from '../components/UserMenuChip'
 import { storage } from '../lib/storageContext'
 import { REWARD_VIDEO_IDS, buildEmbedUrl, fetchVideoTitle } from '../lib/youtube'
 
 interface ShopPageProps {
   user: string
   onBack: () => void
+  onStats: () => void
+  onLogout: () => void
 }
 
 const VIDEO_COST = 5
@@ -25,7 +29,7 @@ const PEEK_SAVER_ITEM: ShopItem = {
   type: 'peekSaver',
   label: 'Peek Saver',
   description: 'Titta på svaret utan att kort hamnar i Öva igen',
-  emoji: '🛡️',
+  emoji: '👀',
   cost: PEEK_SAVER_COST,
 }
 
@@ -73,7 +77,7 @@ function loadYouTubeApi(onReady: () => void) {
   }
 }
 
-export function ShopPage({ user, onBack }: ShopPageProps) {
+export function ShopPage({ user, onBack, onStats, onLogout }: ShopPageProps) {
   const [credits, setCredits] = useState(0)
   const [peekSavers, setPeekSavers] = useState(0)
   const [purchaseCounts, setPurchaseCounts] = useState<Record<string, number>>({})
@@ -95,6 +99,12 @@ export function ShopPage({ user, onBack }: ShopPageProps) {
 
   // Feedback
   const [feedback, setFeedback] = useState<{ text: string; good: boolean } | null>(null)
+
+  // Peek Saver purchase animation: flying +1 from Köp button to badge
+  const [rewardFly, setRewardFly] = useState<{ fromX: number; fromY: number; toX: number; toY: number } | null>(null)
+  const [peekSaverRewardKey, setPeekSaverRewardKey] = useState(0)
+  const peekSaverBuyRectRef = useRef<DOMRect | null>(null)
+  const saversChipRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     storage.getUser(user).then(userData => {
@@ -124,10 +134,15 @@ export function ShopPage({ user, onBack }: ShopPageProps) {
     setTimeout(() => setFeedback(null), 2500)
   }, [])
 
-  const handleBuyClick = useCallback((item: ShopItem, label: string) => {
+  const handleBuyClick = useCallback((item: ShopItem, label: string, e?: MouseEvent) => {
     if (credits < item.cost) {
       showFeedback('Inte nog med poäng!', false)
       return
+    }
+    if (item.type === 'peekSaver' && e?.currentTarget instanceof HTMLElement) {
+      peekSaverBuyRectRef.current = e.currentTarget.getBoundingClientRect()
+    } else {
+      peekSaverBuyRectRef.current = null
     }
     setConfirmLabel(label)
     setConfirmItem(item)
@@ -136,6 +151,12 @@ export function ShopPage({ user, onBack }: ShopPageProps) {
   const handleConfirm = useCallback(async () => {
     if (!confirmItem) return
     const item = confirmItem
+    const isPeekSaver = item.type === 'peekSaver'
+
+    // Use Köp button position (captured when user clicked it) for flying +1
+    const fromRect = isPeekSaver ? peekSaverBuyRectRef.current : null
+    peekSaverBuyRectRef.current = null
+
     setConfirmItem(null)
 
     const success = await storage.spendCreditsAndTrackPurchase(user, item.cost, item.id)
@@ -148,13 +169,23 @@ export function ShopPage({ user, onBack }: ShopPageProps) {
     setCredits(prev => prev - item.cost)
     setPurchaseCounts(prev => ({ ...prev, [item.id]: (prev[item.id] ?? 0) + 1 }))
 
-    if (item.type === 'peekSaver') {
-      // Add peek saver to balance
+    if (isPeekSaver) {
       await storage.addPeekSavers(user, 1)
       setPeekSavers(prev => prev + 1)
-      showFeedback('🛡️ Peek Saver tillagd!', true)
+
+      // Trigger flying +1 and badge bounce
+      const toRect = saversChipRef.current?.getBoundingClientRect()
+      if (fromRect && toRect) {
+        setRewardFly({
+          fromX: fromRect.left + fromRect.width / 2,
+          fromY: fromRect.top + fromRect.height / 2,
+          toX: toRect.left + toRect.width / 2,
+          toY: toRect.top + toRect.height / 2,
+        })
+      }
+      setPeekSaverRewardKey(k => k + 1)
+      setTimeout(() => setRewardFly(null), 1000)
     } else if (item.type === 'video') {
-      // Open the video
       setVideoEnded(false)
       setIsExpanded(false)
       setPlayingVideoId(item.id)
@@ -247,19 +278,34 @@ export function ShopPage({ user, onBack }: ShopPageProps) {
         </div>
       )}
 
-      <div class="shop-header">
-        <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">Tillbaka</button>
-        <div class="shop-title">🛍️ Butiken</div>
-        <div class="shop-balances">
-          <span class="balance-chip balance-credits">💰 {credits}</span>
-          <span class="balance-chip balance-savers">🛡️ {peekSavers}</span>
+      <TopHeader showBack onBack={onBack} maxWidth="900px">
+        <BalanceChip type="credits" count={credits} />
+        <div ref={saversChipRef}>
+          <BalanceChip type="savers" count={peekSavers} rewardBounceTrigger={peekSaverRewardKey} />
         </div>
-        <ThemeToggle />
-      </div>
+        <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onBack} onLogout={onLogout} variant="shop" />
+      </TopHeader>
+
+      <h1 class="page-title w-full max-w-[900px] mx-auto">🛍️ Butiken</h1>
 
       {feedback && (
         <div class={`shop-feedback${feedback.good ? ' shop-feedback-good' : ' shop-feedback-bad'}`}>
           {feedback.text}
+        </div>
+      )}
+
+      {rewardFly && (
+        <div
+          class="reward-fly-badge"
+          style={{
+            '--from-x': `${rewardFly.fromX}px`,
+            '--from-y': `${rewardFly.fromY}px`,
+            '--to-x': `${rewardFly.toX}px`,
+            '--to-y': `${rewardFly.toY}px`,
+          } as Record<string, string>}
+          aria-hidden="true"
+        >
+          +1
         </div>
       )}
 
@@ -287,7 +333,7 @@ export function ShopPage({ user, onBack }: ShopPageProps) {
                   </div>
                   <button
                     class={`shop-buy-btn${canAfford ? '' : ' shop-buy-btn-disabled'}`}
-                    onClick={() => handleBuyClick(item, displayLabel)}
+                    onClick={(e) => handleBuyClick(item, displayLabel, e as unknown as MouseEvent)}
                     disabled={!canAfford}
                     aria-label={`Köp ${displayLabel} för ${item.cost} poäng`}
                   >

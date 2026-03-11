@@ -158,11 +158,33 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .top-bar h1 { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--text); }
 
 /* Chip buttons (shared style) */
-.stats-chip, .user-chip, .back-chip { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 36px; padding: 6px 10px; border: 2px solid var(--border); border-radius: 12px; background: var(--surface); font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .08); transition: border-color .2s, transform .2s; touch-action: manipulation; }
+.stats-chip, .user-chip, .back-chip { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 36px; padding: 6px 10px; border: 2px solid var(--border); border-radius: 12px; background: var(--surface); font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .08); transition: border-color .2s, transform .2s; touch-action: manipulation; }
 .stats-chip:hover, .user-chip:hover, .back-chip:hover { transform: scale(1.02); }
+
+/* Top header (back left, badges+user right) */
+.top-header { width: 100%; margin-bottom: 16px; }
+.page-title { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: var(--text); margin: 0 0 20px; }
+
+/* User menu chip */
+.user-menu-chip-wrapper { position: relative; }
+.user-menu-chip { display: flex; align-items: center; gap: 6px; min-height: 36px; padding: 6px 10px; border: 2px solid var(--border); border-radius: 12px; background: var(--surface); font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .08); transition: border-color .2s, transform .2s; touch-action: manipulation; }
+.user-menu-chip:hover { transform: scale(1.02); }
+.user-menu-chip[aria-expanded="true"] { border-color: var(--tc); background: color-mix(in srgb, var(--tc) 12%, var(--surface)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--tc) 20%, transparent); transform: scale(1.02); }
+.user-menu-chip-icon { font-size: 1rem; line-height: 1; flex-shrink: 0; background: none; }
+.user-menu-chip-name { font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-transform: capitalize; }
+.user-menu-dropdown { position: absolute; top: calc(100% + 6px); right: 0; min-width: 180px; padding: 6px; border-radius: 12px; background: var(--surface); border: 2px solid var(--border); box-shadow: 0 8px 24px rgba(0, 0, 0, .12), 0 2px 8px rgba(0, 0, 0, .06); display: flex; flex-direction: column; gap: 4px; z-index: 100; animation: userMenuIn .2s ease; }
+@keyframes userMenuIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.user-menu-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: none; border-radius: 8px; background: transparent; font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 600; color: var(--text); cursor: pointer; text-align: left; width: 100%; transition: background .15s, transform .15s; touch-action: manipulation; }
+.user-menu-item:hover { background: var(--progress-bg); transform: scale(1.01); }
+.user-menu-item-active { background: var(--progress-bg); font-weight: 700; }
+.user-menu-item-active:hover { background: var(--progress-bg); }
+.user-menu-item-icon { font-size: 1.1rem; flex-shrink: 0; }
 
 @keyframes opFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .op-content { animation: opFadeIn .18s ease; }
+
+.op-tab { transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
+.op-tab:hover { transform: scale(1.02); }
 
 /* TABLE CARD */
 .table-card { display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); padding: 24px 16px 20px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, .08); cursor: pointer; transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; border-top: 5px solid var(--tc); }
@@ -175,7 +197,7 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .table-card.has-wins .completed-badge { opacity: 1; transform: scale(1); }
 
 /* GAME — PILES */
-.piles-bar { width: 100%; max-width: 480px; display: flex; gap: 12px; margin-bottom: 20px; }
+.piles-bar { width: 100%; max-width: 900px; display: flex; gap: 12px; margin-bottom: 20px; }
 .pile-box { flex: 1; background: var(--surface); border-radius: 16px; padding: 12px 16px; text-align: center; box-shadow: 0 3px 12px rgba(0, 0, 0, .07); }
 .pile-box .pile-count { font-family: 'Fredoka One', cursive; font-size: 1.8rem; line-height: 1; }
 .pile-box .pile-label { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--text-muted); margin-top: 2px; }
@@ -254,7 +276,6 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 @media (orientation: portrait) { .hand-toggle { display: none; } }
 
 @media (orientation: landscape) and (min-width: 640px) {
-  .game-header { margin-bottom: 12px; max-width: 800px; }
   .game-layout { flex-direction: row; justify-content: center; max-width: 800px; gap: 32px; }
   .game-layout > :first-child { flex: 1; min-width: 0; }
   .game-keypad-col { flex: 0 0 auto; width: 240px; }
@@ -309,7 +330,7 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .complete-emoji { font-size: 72px; display: block; margin-bottom: 12px; animation: bounce 1s ease-in-out infinite; }
 .complete-box h2 { font-family: 'Fredoka One', cursive; font-size: 2.2rem; color: var(--text); margin-bottom: 8px; }
 .complete-box p { color: var(--text-muted); margin-bottom: 20px; font-size: 1rem; line-height: 1.6; }
-.streak-badge { display: inline-block; background: linear-gradient(135deg, #FFD93D, #FF9A3C); color: white; font-family: 'Fredoka One', cursive; font-size: 1rem; padding: 8px 20px; border-radius: 40px; margin-bottom: 20px; box-shadow: 0 4px 14px #FFD93D66; animation: popIn .6s cubic-bezier(.34, 1.56, .64, 1) .3s both; }
+.streak-badge { display: inline-block; background: linear-gradient(135deg, #FFD93D, #FF9A3C); color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700; padding: 8px 20px; border-radius: 40px; margin-bottom: 20px; box-shadow: 0 4px 14px #FFD93D66; animation: popIn .6s cubic-bezier(.34, 1.56, .64, 1) .3s both; }
 
 .cstat-num { font-family: 'Fredoka One', cursive; font-size: 2.5rem; }
 .cstat-label { font-size: .75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
@@ -342,13 +363,12 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 @keyframes cardIn { from { opacity: 0; transform: translateY(30px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-10px); } 40% { transform: translateX(10px); } 60% { transform: translateX(-8px); } 80% { transform: translateX(8px); } }
 
-.float-feedback { position: fixed; top: 30%; left: 50%; transform: translateX(-50%); font-family: 'Fredoka One', cursive; font-size: 2.5rem; pointer-events: none; z-index: 999; animation: floatUp .8s ease forwards; }
+.float-feedback { position: fixed; top: 30%; left: 50%; transform: translateX(-50%); font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 2.5rem; pointer-events: none; z-index: 999; animation: floatUp .8s ease forwards; }
 @keyframes floatUp { 0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); } 100% { opacity: 0; transform: translateX(-50%) translateY(-80px) scale(1.3); } }
 
 /* RESPONSIVE — SMALL SCREENS */
 @media (max-width: 640px) {
   .game-screen { padding: 12px 16px 16px; }
-  .game-header { margin-bottom: 10px; }
   .piles-bar { margin-bottom: 10px; gap: 8px; }
   .pile-box { padding: 8px 10px; }
   .pile-box .pile-count { font-size: 1.4rem; }
@@ -359,4 +379,89 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
   .answer-display { font-size: 1.6rem; line-height: 1; padding: 10px 16px; height: 52px; min-height: 52px; }
   .keypad-key { min-height: 48px; font-size: 1.3rem; }
   .keypad-grid { gap: 6px; }
+}
+
+/* BALANCE CHIPS */
+.balance-chip-wrapper { position: relative; }
+.balance-chip { position: relative; display: inline-flex; align-items: center; gap: 4px; font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; padding: 6px 8px; border-radius: 12px; min-height: 36px; border: 2px solid transparent; cursor: pointer; transition: transform .2s; touch-action: manipulation; }
+.balance-chip:hover { transform: scale(1.02); }
+.balance-chip[aria-expanded="true"] { box-shadow: 0 0 0 3px color-mix(in srgb, var(--tc) 25%, transparent); }
+.balance-credits { background: #FFF9C4; color: #B7860B; border-color: #F5D55A; }
+.balance-savers { background: #E8F4FF; color: #2563EB; border-color: #93C5FD; }
+[data-theme="dark"] .balance-credits { background: #3d3520; color: #F5D55A; border-color: #6b5a20; }
+[data-theme="dark"] .balance-savers { background: #1e2a3d; color: #93C5FD; border-color: #2a3d5a; }
+.balance-chip-popover { position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; max-width: 280px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 2px solid var(--border); box-shadow: 0 8px 24px rgba(0, 0, 0, .12); z-index: 100; animation: userMenuIn .2s ease; }
+.balance-chip-popover-text { font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+.balance-chip-link { background: none; border: none; padding: 0; font: inherit; color: var(--tc); text-decoration: underline; cursor: pointer; font-weight: 700; }
+.balance-chip-link:hover { text-decoration: none; }
+.balance-chip-reward-bounce { animation: balanceChipBounce 1s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes balanceChipBounce { 0% { transform: scale(1); } 25% { transform: scale(1.25); } 50% { transform: scale(0.95); } 75% { transform: scale(1.08); } 100% { transform: scale(1); } }
+.balance-chip-plus-one { position: absolute; top: -8px; right: -6px; font-size: 0.75rem; font-weight: 800; color: white; background: linear-gradient(135deg, #2563EB, #60A5FA); padding: 2px 6px; border-radius: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.5); animation: plusOnePop 1s cubic-bezier(.34, 1.56, .64, 1) forwards; pointer-events: none; }
+@keyframes plusOnePop { 0% { opacity: 0; transform: scale(0.3); } 40% { opacity: 1; transform: scale(1.2); } 70% { transform: scale(1); } 100% { opacity: 1; transform: scale(1); } }
+
+/* PEEK BUTTON WITH SAVER */
+.btn-peek-has-saver { background: linear-gradient(135deg, #2563EB, #60A5FA) !important; color: white !important; border: none !important; }
+.btn-peek-has-saver:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4); }
+
+/* REWARD CHOICE (COMPLETE PAGE) */
+.reward-choice-section { background: #F5F0FA; border-radius: 16px; padding: 16px; margin-bottom: 4px; border: 2px solid rgba(200, 180, 220, 0.6); }
+[data-theme="dark"] .reward-choice-section { background: #2a2535; border-color: rgba(255, 217, 61, 0.35); }
+.reward-choice-label { font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 0 0 10px; }
+.reward-choice-btns { display: flex; gap: 10px; }
+.btn-reward-choice { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 10px; border-radius: 14px; border: 3px solid transparent; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 0.95rem; transition: transform 0.15s, box-shadow 0.15s; touch-action: manipulation; min-height: 80px; }
+.btn-reward-credits { background: linear-gradient(135deg, #FFD700, #FFA500); color: white; box-shadow: 0 4px 14px rgba(255, 165, 0, 0.35); }
+.btn-reward-saver { background: linear-gradient(135deg, #2563EB, #60A5FA); color: white; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35); }
+.btn-reward-choice:hover { transform: translateY(-2px); }
+.btn-reward-choice:active { transform: scale(0.97); }
+.reward-choice-icon { font-size: 1.8rem; line-height: 1; }
+.reward-choice-text { font-size: 0.9rem; font-weight: 800; }
+.reward-feedback { font-family: 'Nunito', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--success); text-align: center; padding: 12px; animation: popIn 0.4s cubic-bezier(.34, 1.56, .64, 1); }
+
+/* SHOP PAGE */
+.shop-screen { align-items: stretch; overflow-y: auto; padding: 20px 24px 40px; }
+.shop-balances { display: flex; gap: 8px; flex-wrap: wrap; }
+.shop-intro { font-family: 'Nunito', sans-serif; color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; }
+.shop-loading { text-align: center; color: var(--text-muted); font-family: 'Nunito', sans-serif; padding: 40px; }
+.shop-content { max-width: 900px; margin: 0 auto; width: 100%; }
+.shop-feedback { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 40px; font-family: 'Fredoka One', cursive; font-size: 1.1rem; z-index: 100; animation: popIn 0.4s cubic-bezier(.34, 1.56, .64, 1); white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.reward-fly-badge { position: fixed; left: var(--from-x); top: var(--from-y); transform: translate(-50%, -50%); font-family: 'Fredoka One', cursive; font-size: 1rem; font-weight: 700; color: white; background: linear-gradient(135deg, #2563EB, #60A5FA); padding: 6px 12px; border-radius: 12px; box-shadow: 0 4px 16px rgba(37, 99, 235, 0.5); pointer-events: none; z-index: 999; animation: rewardFlyTo 1s cubic-bezier(.25, .46, .45, .94) forwards; }
+@keyframes rewardFlyTo { from { left: var(--from-x); top: var(--from-y); opacity: 1; transform: translate(-50%, -50%) scale(1); } to { left: var(--to-x); top: var(--to-y); opacity: 0.85; transform: translate(-50%, -50%) scale(1.1); } }
+.shop-feedback-good { background: #E8F9ED; color: var(--success); border: 2px solid #86EFAC; }
+.shop-feedback-bad { background: #FFF0EE; color: var(--error); border: 2px solid #FFCCC8; }
+
+.shop-grid { display: flex; flex-direction: column; gap: 12px; }
+.shop-item { display: flex; align-items: center; gap: 14px; background: var(--surface); border-radius: 16px; padding: 14px 16px; box-shadow: var(--card-shadow); border: 2px solid var(--border); transition: border-color 0.2s; }
+.shop-item:hover { border-color: var(--tc); }
+.shop-item-locked { opacity: 0.55; }
+.shop-item-icon { font-size: 2rem; width: 44px; text-align: center; flex-shrink: 0; }
+.shop-item-info { flex: 1; min-width: 0; }
+.shop-item-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; color: var(--text); }
+.shop-item-desc { font-family: 'Nunito', sans-serif; font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
+.shop-item-count { display: inline-block; font-family: 'Nunito', sans-serif; font-size: 0.75rem; font-weight: 800; color: var(--info); background: var(--info-bg); border-radius: 20px; padding: 2px 8px; margin-top: 4px; }
+.shop-buy-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--tc), var(--tc2)); color: white; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; transition: transform 0.15s, opacity 0.15s; touch-action: manipulation; min-width: 64px; min-height: 56px; flex-shrink: 0; }
+.shop-buy-btn:hover:not(:disabled) { transform: translateY(-2px); }
+.shop-buy-btn:active:not(:disabled) { transform: scale(0.97); }
+.shop-buy-btn-disabled { opacity: 0.45; cursor: not-allowed; }
+.shop-buy-cost { font-size: 0.8rem; }
+.shop-buy-label { font-size: 0.9rem; }
+
+/* SHOP CONFIRM MODAL */
+.shop-confirm-modal { max-width: 320px; }
+.shop-confirm-body { padding: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.shop-confirm-item-icon { font-size: 3rem; }
+.shop-confirm-item-name { font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 1.2rem; color: var(--text); margin: 0; }
+.shop-confirm-cost { font-family: 'Nunito', sans-serif; color: var(--text-muted); margin: 0; }
+.shop-confirm-hint { font-family: 'Nunito', sans-serif; font-size: 0.85rem; color: var(--text-muted); margin: 0; }
+.shop-confirm-actions { display: flex; gap: 10px; width: 100%; margin-top: 6px; align-items: stretch; }
+.shop-confirm-actions .btn-secondary,
+.shop-confirm-actions .btn-primary {
+  flex: 1;
+  min-width: 0;
+  min-height: 56px;
+  padding: 12px 8px;
+  font-size: 1rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

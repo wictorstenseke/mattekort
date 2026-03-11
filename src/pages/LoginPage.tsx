@@ -54,7 +54,7 @@ export function LoginPage({ onLogin, login }: LoginPageProps) {
 
   return (
     <div class="screen active login-screen">
-      <div class="mb-3 flex justify-end w-full max-w-[400px] px-2">
+      <div class="fixed top-8 right-8">
         <ThemeToggle />
       </div>
       <div class="login-box">

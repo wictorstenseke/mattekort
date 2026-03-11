@@ -1,27 +1,11 @@
-import { useEffect, useRef, useState } from 'preact/hooks'
+import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import type { RoundResult } from '../hooks/useGame'
-import { ThemeToggle } from '../components/ThemeToggle'
 import { getCategoryDef } from '../lib/constants'
-import { buildEmbedUrl, pickRandomVideoId } from '../lib/youtube'
-
-declare global {
-  interface Window {
-    YT: {
-      Player: new (
-        elementId: string,
-        options: {
-          events?: {
-            onStateChange?: (event: { data: number }) => void
-          }
-        }
-      ) => { destroy(): void }
-    }
-    onYouTubeIframeAPIReady: (() => void) | undefined
-  }
-}
+import { storage } from '../lib/storageContext'
 
 interface CompletePageProps {
   result: RoundResult
+  user: string
   onContinue: () => void
   onBack: () => void
 }
@@ -75,33 +59,15 @@ function getReaction(allClear: boolean, clearCount: number, retryCount: number):
   return encourage[Math.floor(Math.random() * encourage.length)]
 }
 
-function loadYouTubeApi(onReady: () => void) {
-  if (window.YT && window.YT.Player) {
-    onReady()
-    return
-  }
-  const prev = window.onYouTubeIframeAPIReady
-  window.onYouTubeIframeAPIReady = () => {
-    if (prev) prev()
-    onReady()
-  }
-  if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-    const script = document.createElement('script')
-    script.src = 'https://www.youtube.com/iframe_api'
-    document.head.appendChild(script)
-  }
-}
-
-export function CompletePage({ result, onContinue, onBack }: CompletePageProps) {
+export function CompletePage({ result, user, onContinue, onBack }: CompletePageProps) {
   const { clearCount, retryCount, allClear, categoryId, wins } = result
   const categoryLabel = getCategoryDef(categoryId)?.label ?? `${categoryId}:ans tabell`
   const confettiRef = useRef<HTMLDivElement>(null)
   const [reaction] = useState(() => getReaction(allClear, clearCount, retryCount))
 
-  const [showVideo, setShowVideo] = useState(false)
-  const [videoId] = useState(() => pickRandomVideoId())
-  const [videoEnded, setVideoEnded] = useState(false)
-  const [isExpanded, setIsExpanded] = useState(false)
+  // Reward choice state
+  const [rewardChosen, setRewardChosen] = useState(false)
+  const [rewardFeedback, setRewardFeedback] = useState<string | null>(null)
 
   useEffect(() => {
     if (confettiRef.current && (allClear || retryCount === 0)) {
@@ -109,66 +75,34 @@ export function CompletePage({ result, onContinue, onBack }: CompletePageProps) 
     }
   }, [allClear, retryCount])
 
-  useEffect(() => {
-    if (!showVideo) return
-    let player: { destroy(): void } | null = null
+  const handleChooseCredits = useCallback(() => {
+    if (rewardChosen) return
+    setRewardChosen(true)
+    storage.addCredits(user, 4)
+      .then(() => setRewardFeedback('💰 +4 poäng tillagda!'))
+      .catch(() => setRewardFeedback('💰 +4 poäng!'))
+  }, [rewardChosen, user])
 
-    loadYouTubeApi(() => {
-      player = new window.YT.Player('yt-reward-player', {
-        events: {
-          onStateChange: (event: { data: number }) => {
-            if (event.data === 0) setVideoEnded(true)
-          },
-        },
-      })
-    })
+  const handleChoosePeekSaver = useCallback(() => {
+    if (rewardChosen) return
+    setRewardChosen(true)
+    storage.addPeekSavers(user, 1)
+      .then(() => setRewardFeedback('👀 +1 Peek Saver tillagd!'))
+      .catch(() => setRewardFeedback('👀 +1 Peek Saver!'))
+  }, [rewardChosen, user])
 
-    return () => {
-      player?.destroy()
-    }
-  }, [showVideo])
+  const handleContinue = useCallback(() => {
+    if (!rewardChosen) storage.addCredits(user, 4)
+    onContinue()
+  }, [rewardChosen, user, onContinue])
 
-  if (showVideo) {
-    return (
-      <div class="screen active video-reward-screen">
-        <div class={`yt-iframe-wrap${isExpanded ? ' yt-iframe-wrap--expanded' : ''}`}>
-          <iframe
-            id="yt-reward-player"
-            src={buildEmbedUrl(videoId)}
-            title="Belöningsvideo"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-            allowFullScreen
-            frameBorder="0"
-            class="yt-iframe"
-          />
-          {videoEnded && (
-            <div class="yt-ended-overlay">
-              <span class="yt-ended-emoji">🎬</span>
-              <p class="yt-ended-msg">Video klart!</p>
-            </div>
-          )}
-        </div>
-        <div class="video-action-btns">
-          <button
-            class="video-back-btn-outline"
-            onClick={() => setIsExpanded(v => !v)}
-            aria-label={isExpanded ? 'Zooma ut' : 'Zooma in'}
-          >
-            {isExpanded ? '⊖ Zooma ut' : '⊕ Zooma in'}
-          </button>
-          <button class="video-back-btn-outline" onClick={onBack}>
-            Tillbaka
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const handleBack = useCallback(() => {
+    if (!rewardChosen) storage.addCredits(user, 4)
+    onBack()
+  }, [rewardChosen, user, onBack])
 
   return (
     <div class="screen active complete-screen">
-      <div class="mb-3 flex justify-end w-full max-w-[420px]">
-        <ThemeToggle />
-      </div>
       <div class="confetti-container" ref={confettiRef} />
       <div class="complete-box">
         <span class="complete-emoji">{reaction.emoji}</span>
@@ -181,28 +115,39 @@ export function CompletePage({ result, onContinue, onBack }: CompletePageProps) 
           </div>
         )}
 
-        <div class="flex justify-center gap-5 mb-8">
-          <div class="text-center text-(--success)">
-            <div class="cstat-num">{clearCount}</div>
-            <div class="cstat-label">Klara</div>
-          </div>
-          <div class="text-center text-(--warning)">
-            <div class="cstat-num">{retryCount}</div>
-            <div class="cstat-label">Öva igen</div>
-          </div>
+        {/* Reward choice */}
+        <div class="reward-choice-section">
+          {rewardFeedback ? (
+            <div class="reward-feedback">{rewardFeedback}</div>
+          ) : (
+            <>
+              <p class="reward-choice-label">Välj din belöning:</p>
+              <div class="reward-choice-btns">
+                <button
+                  class="btn-reward-choice btn-reward-credits"
+                  onClick={handleChooseCredits}
+                >
+                  <span class="reward-choice-icon">💰</span>
+                  <span class="reward-choice-text">+4 Poäng</span>
+                </button>
+                <button
+                  class="btn-reward-choice btn-reward-saver"
+                  onClick={handleChoosePeekSaver}
+                >
+                  <span class="reward-choice-icon">👀</span>
+                  <span class="reward-choice-text">+1 Peek Saver</span>
+                </button>
+              </div>
+            </>
+          )}
         </div>
 
-        <div class="flex flex-col gap-2.5">
-          <button class="btn-primary" onClick={onContinue}>
+        <div class="flex flex-col gap-2.5 mt-4">
+          <button class="stats-chip w-full" onClick={handleContinue}>
             {allClear ? 'Spela igen! 🎮' : 'Fortsätt öva! 📚'}
           </button>
-          {allClear && categoryId !== 1 && categoryId !== 10 && (
-            <button class="btn-video-reward" onClick={() => setShowVideo(true)}>
-              Se en belöningsvideo! 🎬
-            </button>
-          )}
-          <button class="btn-secondary" onClick={onBack}>
-            Tillbaka
+          <button class="back-chip w-full" onClick={handleBack}>
+            🏠 Hem
           </button>
         </div>
       </div>

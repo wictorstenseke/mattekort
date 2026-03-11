@@ -10,6 +10,7 @@ interface NumericKeypadProps {
   onPeek?: () => void
   onHint?: () => void
   flipped?: boolean
+  peekSavers?: number
 }
 
 const KEYS = [
@@ -21,7 +22,7 @@ const KEYS = [
 
 const HAND_PREF_KEY = 'handedness'
 
-export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPeek, onHint, flipped }: NumericKeypadProps) {
+export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPeek, onHint, flipped, peekSavers = 0 }: NumericKeypadProps) {
   const [rightHanded, setRightHanded] = useState(true)
   const [isSwitching, setIsSwitching] = useState(false)
   const [peekConfirming, setPeekConfirming] = useState(false)
@@ -83,6 +84,8 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
     handleKey(btn.dataset.key!)
   }, [handleKey])
 
+  const hasSavers = peekSavers > 0
+
   return (
     <div class={`keypad-wrapper${rightHanded ? ' right-handed' : ' left-handed'}${isSwitching ? ' switching' : ''}`}>
       <div class="keypad-grid" ref={gridRef} onClick={handleGridClick}>
@@ -103,7 +106,7 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
           })
         )}
       </div>
-      <div class="h-px bg-black/[.08] my-3" />
+      <div class="h-px bg-black/8 my-3" />
       <div class="flex flex-col gap-2 w-full">
         {onHint && (
           <button
@@ -128,13 +131,17 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
         {onPeek && (
           <button
             type="button"
-            class={`btn-peek${peekConfirming ? ' btn-peek-confirming' : ''}`}
+            class={`btn-peek${peekConfirming ? ' btn-peek-confirming' : ''}${hasSavers ? ' btn-peek-has-saver' : ''}`}
             onClick={handlePeekClick}
             disabled={flipped}
             aria-label={peekConfirming ? 'Bekräfta titta på svaret' : 'Titta på svaret'}
           >
             {!peekConfirming && <span class="btn-icon">👀</span>}
-            <span class="btn-text">{peekConfirming ? 'Säker?' : 'Kolla svar'}</span>
+            <span class="btn-text">
+              {peekConfirming
+                ? hasSavers ? `Använd saver? (${peekSavers}st)` : 'Säker? (Till öva igen)'
+                : hasSavers ? `Kolla svar (×${peekSavers})` : 'Kolla svar'}
+            </span>
           </button>
         )}
       </div>

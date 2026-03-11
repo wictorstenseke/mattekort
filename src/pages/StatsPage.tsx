@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'preact/hooks'
-import { ThemeToggle } from '../components/ThemeToggle'
+import { TopHeader } from '../components/TopHeader'
+import { UserMenuChip } from '../components/UserMenuChip'
 import { COLORS, EMOJIS, ALL_CATEGORIES, getCategoryDef } from '../lib/constants'
 import type { Operation } from '../lib/constants'
 import { storage } from '../lib/storageContext'
@@ -9,6 +10,9 @@ import { HistoryModal } from '../components/HistoryModal'
 interface StatsPageProps {
   user: string
   onBack: () => void
+  onStats: () => void
+  onShop: () => void
+  onLogout: () => void
 }
 
 interface Stats {
@@ -113,7 +117,7 @@ function HighlightRow({ icon, color, title, value }: { icon: string; color: stri
   )
 }
 
-export function StatsPage({ user, onBack }: StatsPageProps) {
+export function StatsPage({ user, onBack, onStats, onShop, onLogout }: StatsPageProps) {
   const [stats, setStats] = useState<Stats | null>(null)
   const [completionLog, setCompletionLog] = useState<CompletionEntry[]>([])
   const [showHistory, setShowHistory] = useState(false)
@@ -140,10 +144,10 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
   if (loadError) {
     return (
       <div class="screen active stats-screen">
-        <div class="w-full max-w-[900px] flex items-center mb-4 flex-wrap gap-3 md:gap-4">
-          <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">Tillbaka</button>
-          <h1 class="font-[Fredoka_One] text-2xl text-(--text-secondary) flex-1 max-sm:portrait:text-center">Statistik</h1>
-        </div>
+        <TopHeader showBack onBack={onBack} maxWidth="900px">
+          <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="stats" />
+        </TopHeader>
+        <h1 class="page-title w-full max-w-[900px]">📊 Statistik</h1>
         <p class="stats-empty">Kunde inte ladda statistiken. Försök igen!</p>
       </div>
     )
@@ -164,14 +168,14 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
 
   return (
     <div class="screen active stats-screen">
-      <div class="w-full max-w-[900px] flex items-center mb-4 flex-wrap gap-3 md:gap-4">
-        <button type="button" class="back-chip" onClick={onBack} aria-label="Tillbaka">Tillbaka</button>
-        <h1 class="font-[Fredoka_One] text-2xl text-(--text-secondary) flex-1 max-sm:portrait:text-center">Statistik</h1>
-        <ThemeToggle />
-        <button type="button" class="back-chip" onClick={() => setShowHistory(true)}>
+        <TopHeader showBack onBack={onBack} maxWidth="900px">
+        <button type="button" class="stats-chip" onClick={() => setShowHistory(true)}>
           📋 Historik
         </button>
-      </div>
+        <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="stats" />
+      </TopHeader>
+
+      <h1 class="page-title w-full max-w-[900px]">📊 Statistik</h1>
 
       <div class="w-full max-w-[900px]">
         {!hasData ? (
@@ -179,7 +183,9 @@ export function StatsPage({ user, onBack }: StatsPageProps) {
         ) : (
             <div class="stats-layout-experimental">
               <div class="stats-sidebar flex flex-col gap-3">
-                <h2 class="stats-section-label">Översikt</h2>
+                <div class="flex items-center justify-between gap-2">
+                  <h2 class="stats-section-label">Översikt</h2>
+                </div>
                 <div>
                   <div class="stats-highlights">
                   <HighlightRow icon="🏆" color={COLORS[4]} title="Totala vinster" value={stats.totalWins} />

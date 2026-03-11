@@ -106,7 +106,7 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
           })
         )}
       </div>
-      <div class="h-px bg-black/[.08] my-3" />
+      <div class="h-px bg-black/8 my-3" />
       <div class="flex flex-col gap-2 w-full">
         {onHint && (
           <button

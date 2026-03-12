@@ -12,5 +12,6 @@ export function getMultiplyHints(table: number): number[] {
 export function opSymbol(operation: Operation): string {
   if (operation === 'add') return '+'
   if (operation === 'subtract') return '−'
+  if (operation === 'divide') return '÷'
   return '×'
 }

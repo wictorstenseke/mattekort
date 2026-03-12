@@ -35,6 +35,24 @@ describe('buildDeck', () => {
     const deck = buildDeck({ wins: 0, clear: all, retry: [] })
     expect(deck).toHaveLength(0)
   })
+
+  it('handles combined clear and retry: retry cards come first, cleared cards excluded', () => {
+    // 6 cleared, 2 in retry → deck = 2 retry + 2 remaining fresh = 4 cards total
+    const cleared = [1, 2, 3, 4, 5, 6]
+    const deck = buildDeck({ wins: 0, clear: cleared, retry: [7, 8] })
+    expect(deck).toHaveLength(4)
+    // retry cards are at the front
+    expect(deck[0].fromRetry).toBe(true)
+    expect(deck[1].fromRetry).toBe(true)
+    // remaining cards are fresh (not from retry)
+    expect(deck[2].fromRetry).toBe(false)
+    expect(deck[3].fromRetry).toBe(false)
+    // no cleared card appears in the deck
+    expect(deck.some(c => cleared.includes(c.n))).toBe(false)
+    // the 2 fresh cards are the unaccounted ones: 9 and 10
+    const freshNums = deck.filter(c => !c.fromRetry).map(c => c.n)
+    expect(freshNums).toEqual(expect.arrayContaining([9, 10]))
+  })
 })
 
 describe('isCorrectAnswer', () => {
@@ -68,6 +86,22 @@ describe('isCorrectAnswer', () => {
 
   it('returns false for incorrect subtraction', () => {
     expect(isCorrectAnswer('subtract', 10, 3, 8)).toBe(false)
+  })
+
+  it('returns true for correct division', () => {
+    expect(isCorrectAnswer('divide', 12, 3, 4)).toBe(true)
+    expect(isCorrectAnswer('divide', 10, 2, 5)).toBe(true)
+    expect(isCorrectAnswer('divide', 100, 5, 20)).toBe(true)
+  })
+
+  it('returns false for incorrect division', () => {
+    expect(isCorrectAnswer('divide', 12, 3, 3)).toBe(false)
+    expect(isCorrectAnswer('divide', 10, 2, 6)).toBe(false)
+  })
+
+  it('returns false when dividing by zero', () => {
+    expect(isCorrectAnswer('divide', 12, 0, 0)).toBe(false)
+    expect(isCorrectAnswer('divide', 0, 0, 0)).toBe(false)
   })
 })
 

@@ -7,7 +7,9 @@ import {
   MULTIPLY_CATEGORIES,
   PLUS_CATEGORIES,
   MINUS_CATEGORIES,
+  DIVIDE_CATEGORIES,
   TEN_FRIENDS_CATEGORY_ID,
+  EASY_CATEGORY_IDS,
   FAKE_EMAIL_DOMAIN,
 } from './constants'
 
@@ -71,9 +73,9 @@ describe('getCategoryDef', () => {
 })
 
 describe('ALL_CATEGORIES', () => {
-  it('has the expected total count (multiply + plus + minus)', () => {
+  it('has the expected total count (multiply + plus + minus + divide)', () => {
     expect(ALL_CATEGORIES).toHaveLength(
-      MULTIPLY_CATEGORIES.length + PLUS_CATEGORIES.length + MINUS_CATEGORIES.length,
+      MULTIPLY_CATEGORIES.length + PLUS_CATEGORIES.length + MINUS_CATEGORIES.length + DIVIDE_CATEGORIES.length,
     )
   })
 
@@ -160,5 +162,105 @@ describe('TEN_FRIENDS_CATEGORY_ID', () => {
     expect(cat).toBeDefined()
     expect(cat!.label).toBe('Tiokompisar')
     expect(cat!.operation).toBe('add')
+  })
+})
+
+describe('DIVIDE_CATEGORIES', () => {
+  it('has 4 categories', () => {
+    expect(DIVIDE_CATEGORIES).toHaveLength(4)
+  })
+
+  it('each has operation divide, emoji, color, and generateEquations', () => {
+    for (const cat of DIVIDE_CATEGORIES) {
+      expect(cat.operation).toBe('divide')
+      expect(cat.emoji).toBeTruthy()
+      expect(cat.color).toBeTruthy()
+      expect(typeof cat.generateEquations).toBe('function')
+    }
+  })
+
+  it('has IDs 31, 32, 33, 34', () => {
+    const ids = DIVIDE_CATEGORIES.map(c => c.id)
+    expect(ids).toEqual(expect.arrayContaining([31, 32, 33, 34]))
+  })
+})
+
+describe('getCategoryDef (divide)', () => {
+  it('returns a divide category for id 31', () => {
+    const cat = getCategoryDef(31)
+    expect(cat).toBeDefined()
+    expect(cat!.operation).toBe('divide')
+    expect(cat!.id).toBe(31)
+  })
+
+  it('returns divide categories for all divide IDs', () => {
+    for (const id of [31, 32, 33, 34]) {
+      const cat = getCategoryDef(id)
+      expect(cat).toBeDefined()
+      expect(cat!.operation).toBe('divide')
+    }
+  })
+})
+
+describe('generateEquations invariants (divide)', () => {
+  for (const cat of DIVIDE_CATEGORIES) {
+    describe(cat.label, () => {
+      it('returns exactly 10 items with numeric a and b', () => {
+        const eqs = cat.generateEquations!()
+        expect(eqs).toHaveLength(10)
+        for (const eq of eqs) {
+          expect(typeof eq.a).toBe('number')
+          expect(typeof eq.b).toBe('number')
+        }
+      })
+
+      it('each equation has no remainder (a % b === 0)', () => {
+        const eqs = cat.generateEquations!()
+        for (const eq of eqs) {
+          expect(eq.a % eq.b).toBe(0)
+        }
+      })
+
+      it('all equations use the same non-zero divisor', () => {
+        const eqs = cat.generateEquations!()
+        const divisor = eqs[0].b
+        expect(divisor).toBeGreaterThan(0)
+        for (const eq of eqs) {
+          expect(eq.b).toBe(divisor)
+        }
+      })
+
+      it('produces 10 distinct dividend values', () => {
+        const eqs = cat.generateEquations!()
+        const dividends = eqs.map(e => e.a)
+        expect(new Set(dividends).size).toBe(10)
+      })
+    })
+  }
+})
+
+describe('EASY_CATEGORY_IDS', () => {
+  it('contains id 1 (table 1, the easiest multiply table)', () => {
+    expect(EASY_CATEGORY_IDS.has(1)).toBe(true)
+  })
+
+  it('contains id 10 (table 10, easy multiply table)', () => {
+    expect(EASY_CATEGORY_IDS.has(10)).toBe(true)
+  })
+
+  it('contains TEN_FRIENDS_CATEGORY_ID', () => {
+    expect(EASY_CATEGORY_IDS.has(TEN_FRIENDS_CATEGORY_ID)).toBe(true)
+  })
+
+  it('does not contain mid-range multiply tables (2–9)', () => {
+    for (const id of [2, 3, 4, 5, 6, 7, 8, 9]) {
+      expect(EASY_CATEGORY_IDS.has(id)).toBe(false)
+    }
+  })
+
+  it('does not contain subtract or divide category IDs', () => {
+    for (const id of [21, 22, 23, 31, 32, 33, 34]) {
+      expect(EASY_CATEGORY_IDS.has(id)).toBe(false)
+    }
   })
 })

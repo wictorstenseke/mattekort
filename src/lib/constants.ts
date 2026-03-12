@@ -16,7 +16,7 @@ export function emailToUsername(email: string | null | undefined): string | null
   return email.slice(0, -(FAKE_EMAIL_DOMAIN.length + 1))
 }
 
-export type Operation = 'multiply' | 'add' | 'subtract'
+export type Operation = 'multiply' | 'add' | 'subtract' | 'divide'
 
 export interface CategoryDef {
   id: number
@@ -181,10 +181,50 @@ export const MULTIPLY_CATEGORIES: CategoryDef[] = Array.from({ length: 10 }, (_,
   color2: COLORS2[i],
 }))
 
+export const DIVIDE_CATEGORIES: CategoryDef[] = [
+  {
+    id: 31,
+    operation: 'divide',
+    label: 'Dela med 2',
+    emoji: '✌️',
+    color: '#4CC9F0',
+    color2: '#4361EE',
+    generateEquations: () => shuffle(Array.from({ length: 10 }, (_, i) => ({ a: (i + 1) * 2, b: 2 }))),
+  },
+  {
+    id: 32,
+    operation: 'divide',
+    label: 'Dela med 3',
+    emoji: '🔱',
+    color: '#3A86FF',
+    color2: '#0077B6',
+    generateEquations: () => shuffle(Array.from({ length: 10 }, (_, i) => ({ a: (i + 1) * 3, b: 3 }))),
+  },
+  {
+    id: 33,
+    operation: 'divide',
+    label: 'Dela med 4',
+    emoji: '🍀',
+    color: '#06D6A0',
+    color2: '#118577',
+    generateEquations: () => shuffle(Array.from({ length: 10 }, (_, i) => ({ a: (i + 1) * 4, b: 4 }))),
+  },
+  {
+    id: 34,
+    operation: 'divide',
+    label: 'Dela med 5',
+    emoji: '🖐️',
+    color: '#FFB703',
+    color2: '#FB8500',
+    generateEquations: () => shuffle(Array.from({ length: 10 }, (_, i) => ({ a: (i + 1) * 5, b: 5 }))),
+  },
+]
+
 export const ALL_CATEGORIES: CategoryDef[] = [
   ...MULTIPLY_CATEGORIES,
   ...PLUS_CATEGORIES,
   ...MINUS_CATEGORIES,
+  ...DIVIDE_CATEGORIES,
 ]
 
 export function getCategoryDef(id: number): CategoryDef | undefined {

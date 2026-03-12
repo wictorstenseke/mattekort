@@ -185,6 +185,7 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 
 .op-tab { transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
 .op-tab:hover { transform: scale(1.02); }
+.op-tab.active { border: none !important; }
 
 /* TABLE CARD */
 .table-card { display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); padding: 24px 16px 20px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, .08); cursor: pointer; transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; border-top: 5px solid var(--tc); }
@@ -214,6 +215,10 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .card-front { background: var(--surface); border: 4px solid var(--tc); }
 .card-back { background: var(--tc); transform: rotateY(180deg); color: white; }
 .card-question { font-family: 'Fredoka One', cursive; font-size: 4rem; color: var(--text); line-height: 1.1; }
+.card-question-division { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.card-question-division .fraction-num,
+.card-question-division .fraction-den { font-family: 'Fredoka One', cursive; font-size: 3.5rem; color: var(--text); line-height: 1; }
+.card-question-division .fraction-line { width: 100px; height: 6px; background: var(--text); border-radius: 999px; margin: 2px 0; }
 .card-hint { font-size: .85rem; color: var(--text-muted); margin-top: 8px; font-weight: 600; }
 .card-answer { font-family: 'Fredoka One', cursive; font-size: 4rem; }
 .card-answer-label { font-size: 1.2rem; opacity: .7; margin-top: 4px; }
@@ -376,6 +381,9 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
   .pile-box .pile-count { font-size: 1.4rem; }
   .flashcard { height: 160px; }
   .card-question { font-size: 3rem; }
+  .card-question-division .fraction-num,
+  .card-question-division .fraction-den { font-size: 2.8rem; }
+  .card-question-division .fraction-line { width: 80px; height: 5px; }
   .card-area { margin-bottom: 8px; }
   .hand-toggle { display: none; }
   .answer-display { font-size: 1.6rem; line-height: 1; padding: 10px 16px; height: 52px; min-height: 52px; }

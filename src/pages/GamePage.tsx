@@ -249,7 +249,15 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
             >
               <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}${answerState === 'correct' && !showAnswerAfterWrong ? ' correct' : ''}`}>
                 <div class="card-face card-front">
-                  <div class="card-question">{question}</div>
+                  {operation === 'divide' && current?.a != null && current?.b != null ? (
+                    <div class="card-question-division">
+                      <div class="fraction-num">{current.a}</div>
+                      <div class="fraction-line" />
+                      <div class="fraction-den">{current.b}</div>
+                    </div>
+                  ) : (
+                    <div class="card-question">{question}</div>
+                  )}
                 </div>
                 <div class="card-face card-back">
                   <div class="card-answer">{answer}</div>

@@ -109,6 +109,42 @@ describe('useGame', () => {
       unmount()
     })
 
+    it('initializes a subtract category game with equations', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(21) // Minuskompisar till 10
+      })
+
+      expect(result.current.gameState.operation).toBe('subtract')
+      expect(result.current.gameState.categoryId).toBe(21)
+      expect(result.current.gameState.current).not.toBeNull()
+      // Non-multiply cards must have a and b attached
+      expect(result.current.gameState.current!.a).toBeDefined()
+      expect(result.current.gameState.current!.b).toBeDefined()
+      unmount()
+    })
+
+    it('initializes a divide category game with equations', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(31) // Dela med 2
+      })
+
+      expect(result.current.gameState.operation).toBe('divide')
+      expect(result.current.gameState.categoryId).toBe(31)
+      expect(result.current.gameState.current).not.toBeNull()
+      const card = result.current.gameState.current!
+      expect(card.a).toBeDefined()
+      expect(card.b).toBeDefined()
+      // Divisor is always 2 for "Dela med 2"
+      expect(card.b).toBe(2)
+      // Dividend must be divisible by divisor (no remainders)
+      expect(card.a! % card.b!).toBe(0)
+      unmount()
+    })
+
     it('resets when all cards are cleared', async () => {
       const allCleared = Array.from({ length: 10 }, (_, i) => i + 1)
       mockStorage.getUser.mockResolvedValue({
@@ -167,6 +203,109 @@ describe('useGame', () => {
 
       expect(outcome!).toBe('wrong')
       expect(result.current.gameState.busy).toBe(false)
+      unmount()
+    })
+
+    it('returns correct for an add category using card operands', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(21) // Minuskompisar till 10 (subtract)
+      })
+
+      const card = result.current.gameState.current!
+      const correctAnswer = card.a! - card.b!
+
+      let outcome: string
+      await act(() => {
+        outcome = result.current.submitAnswer(correctAnswer)
+      })
+
+      expect(outcome!).toBe('correct')
+      unmount()
+    })
+
+    it('returns correct for a divide category using card operands', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(31) // Dela med 2
+      })
+
+      const card = result.current.gameState.current!
+      const correctAnswer = card.a! / card.b!
+
+      let outcome: string
+      await act(() => {
+        outcome = result.current.submitAnswer(correctAnswer)
+      })
+
+      expect(outcome!).toBe('correct')
+      expect(result.current.gameState.busy).toBe(true)
+      unmount()
+    })
+
+    it('returns wrong for an incorrect divide answer', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(31) // Dela med 2
+      })
+
+      let outcome: string
+      await act(() => {
+        outcome = result.current.submitAnswer(999)
+      })
+
+      expect(outcome!).toBe('wrong')
+      expect(result.current.gameState.busy).toBe(false)
+      unmount()
+    })
+
+    it('returns correct for TenFriends using the missing addend (10 - a)', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(12) // Tiokompisar
+      })
+
+      const card = result.current.gameState.current!
+      // Correct answer is the missing addend: 10 - a
+      const correctAnswer = 10 - card.a!
+
+      let outcome: string
+      await act(() => {
+        outcome = result.current.submitAnswer(correctAnswer)
+      })
+
+      expect(outcome!).toBe('correct')
+      unmount()
+    })
+
+    it('returns wrong for TenFriends when submitting the full sum instead of the addend', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(12) // Tiokompisar
+      })
+
+      const card = result.current.gameState.current!
+      // Submitting 999 is always wrong
+      let outcome: string
+      await act(() => {
+        outcome = result.current.submitAnswer(999)
+      })
+
+      expect(outcome!).toBe('wrong')
+      // Also verify that submitting "10" (the total sum) is wrong when a > 0
+      if (card.a! > 0) {
+        let outcome2: string
+        await act(() => {
+          outcome2 = result.current.submitAnswer(10)
+        })
+        // 10 - a === 10 only when a === 0, which is not the case here
+        expect(outcome2!).toBe('wrong')
+      }
       unmount()
     })
 
@@ -258,6 +397,25 @@ describe('useGame', () => {
       await act(() => { vi.advanceTimersByTime(2500) })
 
       expect(result.current.gameState.retryPile).toContain(card.n)
+      unmount()
+    })
+
+    it('moves peeked card to clearPile (not retryPile) when useSaver is true', async () => {
+      const { result, unmount } = await renderHookCustom(() => useGame('testuser'))
+
+      await act(async () => {
+        await result.current.startGame(3)
+      })
+
+      const card = result.current.gameState.current!
+
+      await act(() => { result.current.peekCard(true) })
+      expect(result.current.gameState.peeked).toBe(true)
+
+      await act(() => { vi.advanceTimersByTime(2500) })
+
+      expect(result.current.gameState.clearPile).toContain(card.n)
+      expect(result.current.gameState.retryPile).not.toContain(card.n)
       unmount()
     })
 

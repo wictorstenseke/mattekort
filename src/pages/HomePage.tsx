@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'preact/hooks'
 import { BalanceChip } from '../components/BalanceChip'
 import { UserMenuChip } from '../components/UserMenuChip'
-import { MULTIPLY_CATEGORIES, PLUS_CATEGORIES, MINUS_CATEGORIES } from '../lib/constants'
+import { MULTIPLY_CATEGORIES, PLUS_CATEGORIES, MINUS_CATEGORIES, DIVIDE_CATEGORIES } from '../lib/constants'
 import type { Operation, CategoryDef } from '../lib/constants'
 import { storage } from '../lib/storageContext'
 import type { TableData } from '../lib/storage'
@@ -17,13 +17,14 @@ interface HomePageProps {
 
 const TABS: { op: Operation; label: string; gradient: string }[] = [
   { op: 'multiply', label: 'Multiplikation', gradient: 'linear-gradient(135deg, #FF6B6B, #FF9A3C)' },
+  { op: 'divide',   label: 'Division',       gradient: 'linear-gradient(135deg, #4CC9F0, #4361EE)' },
   { op: 'add',      label: 'Addition',       gradient: 'linear-gradient(135deg, #6BCB77, #00C9A7)' },
   { op: 'subtract', label: 'Subtraktion',    gradient: 'linear-gradient(135deg, #C77DFF, #FF6FD8)' },
 ]
 
 function getSavedHomeOperation(user: string): Operation {
   const saved = getPreference(user, 'home_active_op')
-  if (saved === 'multiply' || saved === 'add' || saved === 'subtract') {
+  if (saved === 'multiply' || saved === 'add' || saved === 'subtract' || saved === 'divide') {
     return saved
   }
   return 'multiply'
@@ -59,6 +60,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
   const categories: CategoryDef[] =
     activeOp === 'multiply' ? MULTIPLY_CATEGORIES
     : activeOp === 'add'    ? PLUS_CATEGORIES
+    : activeOp === 'divide' ? DIVIDE_CATEGORIES
     :                         MINUS_CATEGORIES
 
   return (
@@ -83,7 +85,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
               <button
                 key={tab.op}
                 type="button"
-                class={`op-tab py-1.5 px-5 max-sm:portrait:px-3 min-h-9 border-2 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer shadow-[0_2px_8px_rgba(0,0,0,.08)] touch-manipulation ${active ? 'text-white border-transparent shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-(--border) bg-(--surface) text-(--text-secondary)'}`}
+                class={`op-tab py-1.5 px-5 max-sm:portrait:px-3 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${active ? 'active text-white shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-2 border-(--border) bg-(--surface) text-(--text-secondary) shadow-[0_2px_8px_rgba(0,0,0,.08)]'}`}
                 style={active ? `background:${tab.gradient}` : ''}
                 onClick={() => handleTabChange(tab.op)}
               >

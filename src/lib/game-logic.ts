@@ -23,6 +23,7 @@ export function buildDeck(td: TableData): GameCard[] {
 export function isCorrectAnswer(operation: Operation, a: number, b: number, value: number): boolean {
   if (operation === 'multiply') return a * b === value
   if (operation === 'add') return a + b === value
+  if (operation === 'divide') return b !== 0 && a / b === value
   return a - b === value
 }
 

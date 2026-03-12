@@ -56,7 +56,7 @@ function computeCardDisplay(state: GameState, card: GameCard): { question: strin
   const isTenFriends = state.categoryId === TEN_FRIENDS_CATEGORY_ID && state.operation === 'add'
   const sym = opSymbol(state.operation)
   const question = isTenFriends ? `${a} + ?` : `${a} ${sym} ${b}`
-  const answer = isTenFriends ? b : state.operation === 'multiply' ? a * b : state.operation === 'add' ? a + b : a - b
+  const answer = isTenFriends ? b : state.operation === 'multiply' ? a * b : state.operation === 'add' ? a + b : state.operation === 'divide' ? a / b : a - b
   const backLabel = isTenFriends ? `${a} + ${b} = 10` : `${question} = ${answer}`
   return { question, answer, backLabel }
 }

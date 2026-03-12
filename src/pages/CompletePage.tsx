@@ -144,11 +144,11 @@ export function CompletePage({ result, user, onContinue, onBack }: CompletePageP
         </div>
 
         <div class="flex flex-col gap-2.5 mt-4">
-          <button class="stats-chip w-full" onClick={handleContinue}>
-            {allClear ? 'Spela igen! 🎮' : 'Fortsätt öva! 📚'}
+          <button class="btn-primary" onClick={handleContinue}>
+            {allClear ? 'SPELA IGEN! 🎮' : 'FORTSÄTT ÖVA! 📚'}
           </button>
-          <button class="back-chip w-full" onClick={handleBack}>
-            🏠 Hem
+          <button class="btn-primary" style="background: linear-gradient(135deg, #7B8CDE, #5B6FBF); box-shadow: 0 6px 20px #7B8CDE55;" onClick={handleBack}>
+            JAG ÄR KLAR 🏠
           </button>
         </div>
       </div>

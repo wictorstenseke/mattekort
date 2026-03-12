@@ -31,6 +31,7 @@ vi.mock('../lib/savedUsers', () => ({
 
 vi.mock('../lib/storageContext', () => ({
   storage: mockStorage,
+  adminStorage: { getMyProfile: vi.fn().mockResolvedValue(null) },
 }))
 
 import { useAuth } from './useAuth'
@@ -98,7 +99,7 @@ describe('useAuth', () => {
       const { result, unmount } = await renderHookCustom(() => useAuth())
       // Wait for async Firebase init to complete
       await act(async () => { await new Promise(r => setTimeout(r, 0)) })
-      await act(() => { authStateCallback?.({ email: 'alice@matte.kort' }) })
+      await act(async () => { authStateCallback?.({ email: 'alice@matte.kort' }); await new Promise(r => setTimeout(r, 0)) })
       expect(result.current.authReady).toBe(true)
       expect(result.current.currentUser).toBe('alice')
       unmount()

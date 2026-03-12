@@ -1,6 +1,8 @@
 import { firebaseStorageAdapter } from './storage.firebase'
 import type { StorageAdapter, UserData } from './storage'
 
+export { firebaseAdminStorageAdapter as adminStorage } from './storage.firebase.admin'
+
 const CACHE_TTL_MS = 30_000
 
 interface CacheEntry {

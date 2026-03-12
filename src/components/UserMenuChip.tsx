@@ -4,16 +4,17 @@ import { getUserEmoji } from '../lib/savedUsers'
 
 interface UserMenuChipProps {
   user: string
-  onHome: () => void
-  onStats: () => void
-  onShop: () => void
+  onHome?: () => void
+  onStats?: () => void
+  onShop?: () => void
   onLogout: () => void
-  variant: 'home' | 'shop' | 'stats'
+  variant: 'home' | 'shop' | 'stats' | 'superuser' | 'admin'
+  onSuperuser?: () => void
 }
 
 const ALIGN_LEFT_THRESHOLD = 200
 
-export function UserMenuChip({ user, onHome, onStats, onShop, onLogout, variant }: UserMenuChipProps) {
+export function UserMenuChip({ user, onHome, onStats, onShop, onLogout, variant, onSuperuser }: UserMenuChipProps) {
   const [open, setOpen] = useState(false)
   const [alignLeft, setAlignLeft] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -47,14 +48,15 @@ export function UserMenuChip({ user, onHome, onStats, onShop, onLogout, variant 
   }
 
   const menuItems: { icon: string; label: string; onClick: () => void; active?: boolean }[] = [
-    { icon: '🏠', label: 'Hem', onClick: () => closeAnd(onHome), active: variant === 'home' },
-    { icon: '🛍️', label: 'Butiken', onClick: () => closeAnd(onShop), active: variant === 'shop' },
-    { icon: '📊', label: 'Statistik', onClick: () => closeAnd(onStats), active: variant === 'stats' },
+    ...(onHome ? [{ icon: '🏠', label: 'Hem', onClick: () => closeAnd(onHome), active: variant === 'home' }] : []),
+    ...(onShop ? [{ icon: '🛍️', label: 'Butiken', onClick: () => closeAnd(onShop), active: variant === 'shop' }] : []),
+    ...(onStats ? [{ icon: '📊', label: 'Statistik', onClick: () => closeAnd(onStats), active: variant === 'stats' }] : []),
     {
       icon: theme === 'light' ? '🌙' : '☀️',
       label: theme === 'light' ? 'Mörkt läge' : 'Ljust läge',
       onClick: () => closeAnd(toggleTheme),
     },
+    ...(onSuperuser ? [{ icon: '👷', label: 'Admin', onClick: () => closeAnd(onSuperuser), active: variant === 'superuser' || variant === 'admin' }] : []),
     { icon: '🚪', label: 'Logga ut', onClick: () => closeAnd(onLogout) },
   ]
 

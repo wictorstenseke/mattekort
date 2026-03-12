@@ -4,7 +4,7 @@ import { UserMenuChip } from '../components/UserMenuChip'
 import { MULTIPLY_CATEGORIES, PLUS_CATEGORIES, MINUS_CATEGORIES, DIVIDE_CATEGORIES } from '../lib/constants'
 import type { Operation, CategoryDef } from '../lib/constants'
 import { storage } from '../lib/storageContext'
-import type { TableData } from '../lib/storage'
+import type { TableData, UserRole } from '../lib/storage'
 import { getPreference, setPreference } from '../lib/preferences'
 
 interface HomePageProps {
@@ -13,6 +13,8 @@ interface HomePageProps {
   onLogout: () => void
   onStats: () => void
   onShop: () => void
+  role?: UserRole
+  onSuperuser?: () => void
 }
 
 const TABS: { op: Operation; label: string; gradient: string }[] = [
@@ -30,7 +32,7 @@ function getSavedHomeOperation(user: string): Operation {
   return 'multiply'
 }
 
-export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: HomePageProps) {
+export function HomePage({ user, onSelectTable, onLogout, onStats, onShop, role, onSuperuser }: HomePageProps) {
   const [tablesData, setTablesData] = useState<Record<number, TableData>>({})
   const [activeOp, setActiveOp] = useState<Operation>(() => getSavedHomeOperation(user))
   const [credits, setCredits] = useState(0)
@@ -90,7 +92,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
           <div class="top-bar-actions flex items-center gap-2">
             <BalanceChip type="credits" count={credits} onShopClick={onShop} />
             <BalanceChip type="savers" count={peekSavers} onShopClick={onShop} />
-            <UserMenuChip user={user} onHome={() => {}} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="home" />
+            <UserMenuChip user={user} onHome={() => {}} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="home" onSuperuser={(role === 'superuser' || role === 'admin') ? onSuperuser : undefined} />
           </div>
         </div>
         <h1 class="text-center min-[570px]:text-left min-[570px]:order-1 mt-6 min-[570px]:mt-0 flex items-center justify-center min-[570px]:justify-start gap-2">
@@ -110,8 +112,8 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
                 <button
                   key={tab.op}
                   type="button"
-                  class={`op-tab shrink-0 py-1.5 px-5 max-sm:portrait:px-3 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${active ? 'active text-white shadow-[0_3px_12px_rgba(0,0,0,.15)]' : 'border-2 border-(--border) bg-(--surface) text-(--text-secondary) shadow-[0_2px_8px_rgba(0,0,0,.08)]'}`}
-                  style={active ? `background:${tab.gradient}` : ''}
+                                    class={`op-tab shrink-0 py-1.5 px-5 max-sm:portrait:px-3 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${active ? 'active text-white' : 'bg-(--surface) text-(--text-secondary)'}`}
+                  style={active ? `background:${tab.gradient}; box-shadow: 0 3px 12px rgba(0,0,0,.15);` : 'box-shadow: 0 0 0 2px var(--border), 0 2px 8px rgba(0,0,0,.08);'}
                   onClick={() => handleTabChange(tab.op)}
                 >
                   {tab.label}

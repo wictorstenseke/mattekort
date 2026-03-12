@@ -136,6 +136,15 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px #FF6B6B66; }
 .btn-primary:active { transform: scale(.97) translateY(0); box-shadow: 0 3px 10px #FF6B6B55; }
 
+.btn-add-user { font-family: 'Nunito', sans-serif; font-size: .875rem; font-weight: 700; padding: 8px 16px; border-radius: 12px; border: none; cursor: pointer; transition: transform .2s, box-shadow .2s; background: linear-gradient(135deg, #4CAF82, #2E9E6B); color: white; box-shadow: 0 4px 14px #4CAF8255; }
+.btn-add-user:hover { transform: scale(1.02); box-shadow: 0 6px 18px #4CAF8266; }
+.btn-add-user:active { transform: scale(.97); box-shadow: 0 3px 10px #4CAF8255; }
+.btn-add-user.btn-add-user-cancel { background: var(--surface); color: var(--text-muted); border: 2px solid var(--border); box-shadow: none; }
+.btn-add-user.btn-add-user-cancel:hover { transform: scale(1.02); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.btn-add-user.btn-add-user-cancel:active { transform: scale(.97); }
+[data-theme="dark"] .btn-add-user:not(.btn-add-user-cancel) { background: linear-gradient(135deg, #3d9a6d, #238555); box-shadow: 0 4px 14px #3d9a6d55; }
+[data-theme="dark"] .btn-add-user:not(.btn-add-user-cancel):hover { box-shadow: 0 8px 20px #3d9a6d66; }
+
 .login-error { font-weight: 700; font-size: .9rem; margin-top: 12px; min-height: 20px; color: transparent; }
 .login-error:not(:empty) { color: var(--error); background: var(--error-bg); border: 2px solid var(--error-border); border-radius: 12px; padding: 10px 16px; animation: shake .4s ease; }
 
@@ -184,9 +193,9 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 @keyframes opFadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .op-content { animation: opFadeIn .18s ease; }
 
-.op-tab { transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease; }
+.op-tab { transition: background .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease; }
 .op-tab:hover { transform: scale(1.02); }
-.op-tab.active { border: none !important; }
+.op-tab.active { border: none !important; box-shadow: 0 3px 12px rgba(0,0,0,.15); }
 
 /* TABLE CARD */
 .table-card { display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); padding: 24px 16px 20px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, .08); cursor: pointer; transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; border-top: 5px solid var(--tc); }

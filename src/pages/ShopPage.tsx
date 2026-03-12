@@ -10,6 +10,7 @@ interface ShopPageProps {
   onBack: () => void
   onStats: () => void
   onLogout: () => void
+  onSuperuser?: () => void
 }
 
 const VIDEO_COST = 5
@@ -77,7 +78,7 @@ function loadYouTubeApi(onReady: () => void) {
   }
 }
 
-export function ShopPage({ user, onBack, onStats, onLogout }: ShopPageProps) {
+export function ShopPage({ user, onBack, onStats, onLogout, onSuperuser }: ShopPageProps) {
   const [credits, setCredits] = useState(0)
   const [peekSavers, setPeekSavers] = useState(0)
   const [purchaseCounts, setPurchaseCounts] = useState<Record<string, number>>({})
@@ -279,7 +280,7 @@ export function ShopPage({ user, onBack, onStats, onLogout }: ShopPageProps) {
       )}
 
       <TopHeader showBack onBack={onBack} maxWidth="900px">
-        <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onBack} onLogout={onLogout} variant="shop" />
+        <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={() => {}} onLogout={onLogout} variant="shop" onSuperuser={onSuperuser} />
       </TopHeader>
 
       <h1 class="page-title w-full max-w-[900px] mx-auto">🛍️ Butiken</h1>

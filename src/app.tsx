@@ -9,8 +9,9 @@ const GamePage = lazy(() => import('./pages/GamePage'))
 const CompletePage = lazy(() => import('./pages/CompletePage'))
 const StatsPage = lazy(() => import('./pages/StatsPage'))
 const ShopPage = lazy(() => import('./pages/ShopPage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
 
-type Screen = 'login' | 'home' | 'game' | 'complete' | 'stats' | 'shop'
+type Screen = 'login' | 'home' | 'game' | 'complete' | 'stats' | 'shop' | 'admin' | 'superuser'
 
 function ScreenFallback() {
   return (
@@ -21,22 +22,28 @@ function ScreenFallback() {
 }
 
 export function App() {
-  const { currentUser, authReady, login, logout } = useAuth()
+  const { currentUser, authReady, role, login, logout } = useAuth()
   const [screen, setScreen] = useState<Screen>('login')
   const [selectedTable, setSelectedTable] = useState(1)  // stores categoryId
 
   useEffect(() => {
     if (authReady && currentUser && screen === 'login') {
-      setScreen('home')
+      if (role === 'admin') setScreen('admin')
+      else setScreen('home')
     }
-  }, [authReady, currentUser, screen])
+  }, [authReady, currentUser, role, screen])
 
-  const effectiveScreen: Screen = authReady && currentUser && screen === 'login' ? 'home' : screen
+  const effectiveScreen: Screen = (() => {
+    if (!authReady || !currentUser || screen !== 'login') return screen
+    if (role === 'admin') return 'admin'
+    return 'home'
+  })()
+
   const [gameKey, setGameKey] = useState(0)
   const [completeResult, setCompleteResult] = useState<RoundResult | null>(null)
 
   const handleLogin = useCallback(() => {
-    setScreen('home')
+    // role-aware redirect handled by useEffect
   }, [])
 
   const handleLogout = useCallback(async () => {
@@ -72,6 +79,14 @@ export function App() {
     setScreen('shop')
   }, [])
 
+  const handleSuperuser = useCallback(() => {
+    setScreen('superuser')
+  }, [])
+
+  const handleAdmin = useCallback(() => {
+    setScreen('admin')
+  }, [])
+
   if (!authReady) {
     return <ScreenFallback />
   }
@@ -87,6 +102,8 @@ export function App() {
           onLogout={handleLogout}
           onStats={handleStats}
           onShop={handleShop}
+          role={role ?? undefined}
+          onSuperuser={role === 'superuser' ? handleSuperuser : role === 'admin' ? handleAdmin : undefined}
         />
       )
     case 'game':
@@ -121,6 +138,7 @@ export function App() {
             onStats={handleStats}
             onShop={handleShop}
             onLogout={handleLogout}
+            onSuperuser={role === 'superuser' ? handleSuperuser : role === 'admin' ? handleAdmin : undefined}
           />
         </Suspense>
       )
@@ -131,6 +149,33 @@ export function App() {
             user={currentUser!}
             onBack={goHome}
             onStats={handleStats}
+            onLogout={handleLogout}
+            onSuperuser={role === 'superuser' ? handleSuperuser : role === 'admin' ? handleAdmin : undefined}
+          />
+        </Suspense>
+      )
+    case 'admin':
+      return (
+        <Suspense fallback={<ScreenFallback />}>
+          <AdminPage
+            role="admin"
+            user={currentUser!}
+            onBack={goHome}
+            onStats={handleStats}
+            onShop={handleShop}
+            onLogout={handleLogout}
+          />
+        </Suspense>
+      )
+    case 'superuser':
+      return (
+        <Suspense fallback={<ScreenFallback />}>
+          <AdminPage
+            role="superuser"
+            user={currentUser!}
+            onBack={goHome}
+            onStats={handleStats}
+            onShop={handleShop}
             onLogout={handleLogout}
           />
         </Suspense>

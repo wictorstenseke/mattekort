@@ -51,7 +51,8 @@ export const firebaseStorageAdapter: StorageAdapter = {
     const uid = await requireUid()
     const db = await getFirebaseDb()
     const { doc, updateDoc } = await import('firebase/firestore')
-    await updateDoc(doc(db, 'users', uid), { [`tables.${table}`]: data })
+    const clean = Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined))
+    await updateDoc(doc(db, 'users', uid), { [`tables.${table}`]: clean })
   },
 
   async createUser(username: string, pin: string): Promise<void> {

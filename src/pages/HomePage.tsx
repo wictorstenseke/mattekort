@@ -122,7 +122,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop }: Hom
           <div class="hidden max-sm:portrait:block absolute right-0 top-0 bottom-0 w-10 bg-linear-to-l from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtEnd ? 'opacity:0' : ''} />
         </div>
 
-        <div class={`grid gap-6 w-full max-w-[900px] op-content ${activeOp !== 'multiply' ? 'grid-cols-[repeat(auto-fill,minmax(200px,1fr))]' : 'grid-cols-[repeat(auto-fill,minmax(160px,1fr))]'}`}>
+        <div class="grid gap-6 w-full max-w-[900px] op-content grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">
           {categories.map(cat => {
             const td: TableData = tablesData[cat.id] ?? { wins: 0, clear: [], retry: [] }
             const clearN = td.clear.length

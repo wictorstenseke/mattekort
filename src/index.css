@@ -414,7 +414,7 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .balance-chip-popover { position: absolute; top: calc(100% + 6px); right: 0; min-width: 220px; max-width: 280px; padding: 12px 14px; border-radius: 12px; background: var(--surface); border: 2px solid var(--border); box-shadow: 0 8px 24px rgba(0, 0, 0, .12); z-index: 100; animation: userMenuIn .2s ease; }
 .balance-chip-popover--align-left { left: 0; right: auto; }
 .balance-chip-popover-text { font-family: 'Nunito', sans-serif; font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); line-height: 1.5; margin: 0; }
-.balance-chip-link { background: none; border: none; padding: 0; font: inherit; color: var(--tc); text-decoration: underline; cursor: pointer; font-weight: 700; }
+.balance-chip-link { background: none; border: none; padding: 0; font: inherit; color: var(--info); text-decoration: underline; cursor: pointer; font-weight: 700; }
 .balance-chip-link:hover { text-decoration: none; }
 .balance-chip-reward-bounce { animation: balanceChipBounce 1s cubic-bezier(.34, 1.56, .64, 1); }
 @keyframes balanceChipBounce { 0% { transform: scale(1); } 25% { transform: scale(1.25); } 50% { transform: scale(0.95); } 75% { transform: scale(1.08); } 100% { transform: scale(1); } }

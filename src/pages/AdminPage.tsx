@@ -151,7 +151,7 @@ export default function AdminPage({ role, user, onLogout, onBack, onStats, onSho
 
   return (
     <div
-      class="min-h-dvh flex flex-col relative z-[1]"
+      class="min-h-dvh flex flex-col relative z-1"
       style="padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom);"
     >
       {/* Header */}

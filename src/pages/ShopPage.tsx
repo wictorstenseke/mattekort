@@ -110,7 +110,7 @@ export function ShopPage({ user, onBack, onStats, onLogout, onSuperuser }: ShopP
         const spaceVideos = userData.spaceVideos ?? {}
         const hidden = new Set(userData.hiddenVideos ?? [])
         const configured = [...new Set(Object.values(spaceVideos).flat())]
-        const pool = configured.length > 0 ? configured : REWARD_VIDEO_IDS
+        const pool = [...new Set([...REWARD_VIDEO_IDS, ...configured])]
         setVideoIds(pool.filter(id => !hidden.has(id)))
       }
       setLoading(false)

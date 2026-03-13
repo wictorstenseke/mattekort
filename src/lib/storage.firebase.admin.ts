@@ -129,21 +129,25 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
   },
 
   async propagateSpaceConfig(
-    fields: Pick<UserData, 'activeCategories' | 'creditsEnabled' | 'spaceVideos'>
+    fields: Pick<UserData, 'activeCategories' | 'creditsEnabled' | 'spaceVideos' | 'hiddenVideos'>
   ): Promise<void> {
     const uid = await requireUid()
     const db = await getFirebaseDb()
-    const { collection, query, where, getDocs, doc, writeBatch } = await import('firebase/firestore')
+    const { collection, query, where, getDocs, doc, writeBatch, deleteField } = await import('firebase/firestore')
 
-    const q = query(collection(db, 'profiles'), where('spaceId', '==', uid))
-    const snaps = await getDocs(q)
+    const userQuery = query(
+      collection(db, 'profiles'),
+      where('spaceId', '==', uid),
+      where('role', '==', 'user')
+    )
+    const userSnaps = await getDocs(userQuery)
 
     // Firestore batch limit is 500 writes
     const batchSize = 499
     let batch = writeBatch(db)
     let count = 0
 
-    for (const snap of snaps.docs) {
+    for (const snap of userSnaps.docs) {
       batch.set(doc(db, 'users', snap.id), fields, { merge: true })
       count++
       if (count % batchSize === 0) {
@@ -151,7 +155,26 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
         batch = writeBatch(db)
       }
     }
-    if (count % batchSize !== 0) await batch.commit()
+
+    // Clear activeCategories from admin docs to remove any stale superuser data
+    if ('activeCategories' in fields) {
+      const adminQuery = query(
+        collection(db, 'profiles'),
+        where('spaceId', '==', uid),
+        where('role', '==', 'admin')
+      )
+      const adminSnaps = await getDocs(adminQuery)
+      for (const snap of adminSnaps.docs) {
+        batch.set(doc(db, 'users', snap.id), { activeCategories: deleteField() }, { merge: true })
+        count++
+        if (count % batchSize === 0) {
+          await batch.commit()
+          batch = writeBatch(db)
+        }
+      }
+    }
+
+    await batch.commit()
   },
 
   async listAdmins(): Promise<UserProfile[]> {

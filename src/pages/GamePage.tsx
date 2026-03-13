@@ -39,7 +39,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
       if (userData) {
         setPeekSavers(userData.peekSavers ?? 0)
         const activeCategories = userData.activeCategories
-        if (activeCategories !== null && !activeCategories.includes(categoryId)) {
+        if (activeCategories != null && !activeCategories.includes(categoryId)) {
           onBack()
           return
         }

@@ -106,10 +106,16 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
   async getSpaceConfig(): Promise<SpaceConfig | null> {
     const uid = await requireUid()
     const db = await getFirebaseDb()
-    const { doc, getDoc } = await import('firebase/firestore')
+    const { doc, getDoc, setDoc } = await import('firebase/firestore')
     const snap = await getDoc(doc(db, 'spaces', uid))
     if (!snap.exists()) return null
     const d = snap.data()
+    // Keep superuser's own users doc in sync with current video config
+    // so their ShopPage always reflects the latest state
+    await setDoc(doc(db, 'users', uid), {
+      spaceVideos: d.videos ?? {},
+      hiddenVideos: d.hiddenVideos ?? [],
+    }, { merge: true })
     return {
       adminUid: d.adminUid,
       adminUsername: d.adminUsername,
@@ -137,8 +143,7 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
 
     const userQuery = query(
       collection(db, 'profiles'),
-      where('spaceId', '==', uid),
-      where('role', '==', 'user')
+      where('spaceId', '==', uid)
     )
     const userSnaps = await getDocs(userQuery)
 
@@ -148,6 +153,8 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
     let count = 0
 
     for (const snap of userSnaps.docs) {
+      const role = snap.data().role as string | undefined
+      if (role === 'admin' || role === 'superuser') continue
       batch.set(doc(db, 'users', snap.id), fields, { merge: true })
       count++
       if (count % batchSize === 0) {
@@ -175,6 +182,15 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
     }
 
     await batch.commit()
+
+    // Also write video fields to the caller's own users doc (superuser sees their own shop)
+    const ownVideoFields: Record<string, unknown> = {}
+    if ('spaceVideos' in fields) ownVideoFields.spaceVideos = fields.spaceVideos
+    if ('hiddenVideos' in fields) ownVideoFields.hiddenVideos = fields.hiddenVideos
+    if (Object.keys(ownVideoFields).length > 0) {
+      const { setDoc } = await import('firebase/firestore')
+      await setDoc(doc(db, 'users', uid), ownVideoFields, { merge: true })
+    }
   },
 
   async listAdmins(): Promise<UserProfile[]> {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'preact/hooks'
+import { useToast } from '../../contexts/ToastContext'
 import {
   ALL_CATEGORIES,
   MULTIPLY_CATEGORIES,
@@ -28,7 +29,7 @@ export function KategoriTab({
     activeCategories === null ? new Set(ALL_CATEGORIES.map(c => c.id)) : new Set(activeCategories)
   )
   const [saving, setSaving] = useState(false)
-  const [toast, setToast] = useState(false)
+  const { addToast } = useToast()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const performSave = useCallback(async (ids: Set<number>) => {
@@ -37,12 +38,11 @@ export function KategoriTab({
       const allIds = ALL_CATEGORIES.map(c => c.id)
       const isAll = allIds.every(id => ids.has(id))
       await onSave(isAll ? null : Array.from(ids))
-      setToast(true)
-      setTimeout(() => setToast(false), 2500)
+      addToast('Sparat')
     } finally {
       setSaving(false)
     }
-  }, [onSave])
+  }, [onSave, addToast])
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -126,11 +126,6 @@ export function KategoriTab({
           {saving ? 'Sparar...' : 'Spara nu'}
         </button>
       </div>
-      {toast && (
-        <div class="kategori-toast">
-          Sparat
-        </div>
-      )}
     </div>
   )
 }

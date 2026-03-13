@@ -97,3 +97,7 @@ function withCache(adapter: StorageAdapter): StorageAdapter {
 }
 
 export const storage: StorageAdapter = withCache(firebaseStorageAdapter)
+
+export function clearUserCache(): void {
+  cache.clear()
+}

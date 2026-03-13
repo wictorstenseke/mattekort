@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'preact/hooks'
-import { adminStorage } from '../lib/storageContext'
+import { adminStorage, clearUserCache } from '../lib/storageContext'
 import type { SpaceUser, SpaceConfig } from '../lib/storage'
 
 export function useAdmin() {
@@ -18,6 +18,9 @@ export function useAdmin() {
       ])
       setUsers(fetchedUsers)
       setSpaceConfig(fetchedConfig)
+      // Superuser's own users doc was synced in getSpaceConfig — clear
+      // the storage cache so ShopPage reads fresh data on next visit
+      clearUserCache()
     } catch (err) {
       setError('Kunde inte ladda data. Försök igen.')
       console.error(err)

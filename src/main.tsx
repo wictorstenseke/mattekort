@@ -1,5 +1,11 @@
 import { render } from 'preact'
 import './index.css'
 import { App } from './app.tsx'
+import { ToastProvider } from './contexts/ToastContext'
 
-render(<App />, document.getElementById('app')!)
+render(
+  <ToastProvider>
+    <App />
+  </ToastProvider>,
+  document.getElementById('app')!
+)

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'preact/hooks'
+import { useToast } from '../../contexts/ToastContext'
 import { extractYouTubeId, fetchVideoTitle, REWARD_VIDEO_IDS } from '../../lib/youtube'
 
 export function VideoTab({
@@ -18,6 +19,7 @@ export function VideoTab({
   const [input, setInput] = useState('')
   const [error, setError] = useState('')
   const [showForm, setShowForm] = useState(false)
+  const { addToast } = useToast()
 
   // Flatten configured videos preserving source catId
   const flatVideos: { catId: string; id: string }[] = Object.entries(videos).flatMap(
@@ -54,6 +56,7 @@ export function VideoTab({
     setInput('')
     setError('')
     setShowForm(false)
+    addToast('Video tillagd')
     fetchVideoTitle(id).then(title => {
       if (title) setTitles(prev => ({ ...prev, [id]: title }))
     })
@@ -109,32 +112,33 @@ export function VideoTab({
           const isHidden = hiddenSet.has(id)
           const isCustom = customIds.has(id)
           return (
-            <div
-              key={id}
-              role="button"
-              tabIndex={0}
-              onClick={() => onToggleHide(id)}
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleHide(id); } }}
-              class={`flex items-center gap-2 cursor-pointer rounded-2xl border border-(--border) px-4 py-2 min-h-9 transition-all duration-200 hover:bg-(--border) ${isHidden ? 'opacity-75 hover:opacity-95' : ''}`}
-              style="background-color: var(--surface)"
-            >
-              <span
-                class="shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center text-xs font-bold"
-                style={!isHidden ? 'border-color: var(--tc); color: white; background: var(--tc)' : 'border-color: var(--border); background: var(--surface)'}
-                aria-hidden
+            <div key={id} class="flex items-center gap-2">
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={async () => { await onToggleHide(id); addToast(hiddenSet.has(id) ? 'Video visas' : 'Video dold') }}
+                onKeyDown={async e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); await onToggleHide(id); addToast(hiddenSet.has(id) ? 'Video visas' : 'Video dold') } }}
+                class={`flex-1 min-w-0 flex items-center gap-2 cursor-pointer rounded-2xl border border-(--border) px-4 py-2 min-h-9 transition-all duration-200 hover:bg-(--border) ${isHidden ? 'opacity-75 hover:opacity-95' : ''}`}
+                style="background-color: var(--surface)"
               >
-                {!isHidden ? '✓' : ''}
-              </span>
-              <span class="text-base shrink-0">🎬</span>
-              <span class={`flex-1 text-sm truncate min-w-0 ${isHidden ? 'text-(--text-muted)' : 'text-(--text)'}`} title={id}>
-                {titles[id] ?? id}
-                {!isCustom && <span class="text-(--text-muted) text-xs ml-1">standard</span>}
-              </span>
+                <span
+                  class="shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center text-xs font-bold"
+                  style={!isHidden ? 'border-color: var(--tc); color: white; background: var(--tc)' : 'border-color: var(--border); background: var(--surface)'}
+                  aria-hidden
+                >
+                  {!isHidden ? '✓' : ''}
+                </span>
+                <span class="text-base shrink-0">🎬</span>
+                <span class={`flex-1 text-sm truncate min-w-0 ${isHidden ? 'text-(--text-muted)' : 'text-(--text)'}`} title={id}>
+                  {titles[id] ?? id}
+                  {!isCustom && <span class="text-(--text-muted) text-xs ml-1">standard</span>}
+                </span>
+              </div>
               {isCustom && (
                 <button
                   type="button"
-                  onClick={e => { e.stopPropagation(); onRemove(customCatMap.get(id)!, id); }}
-                  class="back-chip text-xs px-3 py-1 shrink-0"
+                  onClick={async e => { e.stopPropagation(); await onRemove(customCatMap.get(id)!, id); addToast('Video raderad') }}
+                  class="shrink-0 back-chip text-xs px-3 py-1"
                   style="border-color: #f87171; color: #f87171;"
                 >
                   Radera

@@ -8,8 +8,8 @@ interface BalanceChipProps {
 }
 
 const DESCRIPTIONS = {
-  credits: { before: 'Poäng som du tjänar genom att klara kort. Använd dem för att köpa belöningar i ', link: 'butiken', after: '.' },
-  savers: { before: 'Titta på svaret utan att kort hamnar i Öva igen-pilen. Köp fler i ', link: 'butiken', after: '.' },
+  credits: { before: 'Poäng som du tjänar genom att klara kort. Använd dem för att köpa belöningar i ', link: 'affären', after: '.' },
+  savers: { before: 'Titta på svaret utan att kort hamnar i Öva igen-pilen. Köp fler i ', link: 'affären', after: '.' },
 } as const
 
 const ALIGN_LEFT_THRESHOLD = 250
@@ -52,7 +52,7 @@ export function BalanceChip({ type, count, onShopClick, rewardBounceTrigger }: B
   }, [open])
 
   const isCredits = type === 'credits'
-  const title = isCredits ? 'Dina poäng' : 'Dina Peek Savers'
+  const title = isCredits ? 'Dina poäng' : 'Dina Kika gratis'
   const label = isCredits ? '💰' : '👀'
 
   return (

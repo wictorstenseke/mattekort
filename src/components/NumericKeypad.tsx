@@ -149,7 +149,7 @@ export function NumericKeypad({ value, onChange, onSubmit, disabled, user, onPee
             {!peekConfirming && <span class="btn-icon">👀</span>}
             <span class="btn-text">
               {peekConfirming
-                ? hasSavers ? `Använd saver? (${peekSavers}st)` : 'Säker? (Till öva igen)'
+                ? hasSavers ? `Använd Kika gratis? (${peekSavers}st)` : 'Säker? (Till öva igen)'
                 : hasSavers ? `Kolla svar (×${peekSavers})` : 'Kolla svar'}
             </span>
           </button>

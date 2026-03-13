@@ -1,3 +1,4 @@
+import { Fragment } from 'preact'
 import { useState, useRef, useEffect } from 'preact/hooks'
 import { useTheme } from '../hooks/useTheme'
 import { getUserEmoji } from '../lib/savedUsers'
@@ -47,18 +48,22 @@ export function UserMenuChip({ user, onHome, onStats, onShop, onLogout, variant,
     fn()
   }
 
-  const menuItems: { icon: string; label: string; onClick: () => void; active?: boolean }[] = [
+  type MenuItem = { icon: string; label: string; onClick: () => void; active?: boolean }
+  const navItems: MenuItem[] = [
     ...(onHome ? [{ icon: '🏠', label: 'Hem', onClick: () => closeAnd(onHome), active: variant === 'home' }] : []),
-    ...(onShop ? [{ icon: '🛍️', label: 'Butiken', onClick: () => closeAnd(onShop), active: variant === 'shop' }] : []),
+    ...(onShop ? [{ icon: '🛍️', label: 'Affär', onClick: () => closeAnd(onShop), active: variant === 'shop' }] : []),
     ...(onStats ? [{ icon: '📊', label: 'Statistik', onClick: () => closeAnd(onStats), active: variant === 'stats' }] : []),
+  ]
+  const settingsItems: MenuItem[] = [
+    ...(onSuperuser ? [{ icon: '👷', label: 'Admin', onClick: () => closeAnd(onSuperuser), active: variant === 'superuser' || variant === 'admin' }] : []),
     {
       icon: theme === 'light' ? '🌙' : '☀️',
       label: theme === 'light' ? 'Mörkt läge' : 'Ljust läge',
       onClick: () => closeAnd(toggleTheme),
     },
-    ...(onSuperuser ? [{ icon: '👷', label: 'Admin', onClick: () => closeAnd(onSuperuser), active: variant === 'superuser' || variant === 'admin' }] : []),
-    { icon: '🚪', label: 'Logga ut', onClick: () => closeAnd(onLogout) },
   ]
+  const logoutItem: MenuItem = { icon: '🚪', label: 'Logga ut', onClick: () => closeAnd(onLogout) }
+  const groups = [navItems, settingsItems, [logoutItem]].filter((g) => g.length > 0)
 
   return (
     <div class="user-menu-chip-wrapper" ref={containerRef}>
@@ -79,17 +84,22 @@ export function UserMenuChip({ user, onHome, onStats, onShop, onLogout, variant,
           class={`user-menu-dropdown${alignLeft ? ' user-menu-dropdown--align-left' : ''}`}
           role="menu"
         >
-          {menuItems.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              class={`user-menu-item${item.active ? ' user-menu-item-active' : ''}`}
-              role="menuitem"
-              onClick={item.onClick}
-            >
-              <span class="user-menu-item-icon">{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
+          {groups.map((group, groupIdx) => (
+            <Fragment key={groupIdx}>
+              {groupIdx > 0 && <div class="user-menu-divider" role="separator" />}
+              {group.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  class={`user-menu-item${item.active ? ' user-menu-item-active' : ''}`}
+                  role="menuitem"
+                  onClick={item.onClick}
+                >
+                  <span class="user-menu-item-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </Fragment>
           ))}
         </div>
       )}

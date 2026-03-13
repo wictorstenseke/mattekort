@@ -450,19 +450,22 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .shop-feedback-good { background: #E8F9ED; color: var(--success); border: 2px solid #86EFAC; }
 .shop-feedback-bad { background: #FFF0EE; color: var(--error); border: 2px solid #FFCCC8; }
 
+.kategori-toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 40px; font-family: 'Fredoka One', cursive; font-size: 1.1rem; z-index: 100; animation: popIn 0.4s cubic-bezier(.34, 1.56, .64, 1); white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,0.15); background: #E8F9ED; color: var(--success); border: 2px solid #86EFAC; }
+
 .shop-grid { display: flex; flex-direction: column; gap: 12px; }
-.shop-item { display: flex; align-items: center; gap: 14px; background: var(--surface); border-radius: 16px; padding: 14px 16px; box-shadow: var(--card-shadow); border: 2px solid var(--border); transition: border-color 0.2s; }
+.shop-item { display: flex; align-items: flex-start; gap: 14px; background: var(--surface); border-radius: 16px; padding: 14px 16px; box-shadow: var(--card-shadow); border: 2px solid var(--border); transition: border-color 0.2s; }
 .shop-item:hover { border-color: var(--tc); }
+.shop-item-clickable { cursor: pointer; }
 .shop-item-locked { opacity: 0.55; }
-.shop-item-icon { font-size: 2rem; width: 44px; text-align: center; flex-shrink: 0; }
+.shop-item-icon { font-size: 2rem; width: 44px; text-align: left; flex-shrink: 0; }
 .shop-item-info { flex: 1; min-width: 0; }
 .shop-item-name { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 1rem; color: var(--text); }
 .shop-item-desc { font-family: 'Nunito', sans-serif; font-size: 0.82rem; color: var(--text-muted); margin-top: 2px; }
 .shop-item-count { display: inline-block; font-family: 'Nunito', sans-serif; font-size: 0.75rem; font-weight: 800; color: var(--info); background: var(--info-bg); border-radius: 20px; padding: 2px 8px; margin-top: 4px; }
-.shop-buy-btn { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--tc), var(--tc2)); color: white; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; transition: transform 0.15s, opacity 0.15s; touch-action: manipulation; min-width: 64px; min-height: 56px; flex-shrink: 0; }
-.shop-buy-btn:hover:not(:disabled) { transform: translateY(-2px); }
-.shop-buy-btn:active:not(:disabled) { transform: scale(0.97); }
-.shop-buy-btn-disabled { opacity: 0.45; cursor: not-allowed; }
+.shop-buy-btn { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 12px; border: none; background: linear-gradient(135deg, var(--tc), var(--tc2)); color: white; font-family: 'Nunito', sans-serif; font-weight: 800; cursor: pointer; transition: transform 0.15s, opacity 0.15s; touch-action: manipulation; min-height: 44px; flex-shrink: 0; align-self: center; }
+.shop-item-clickable .shop-buy-btn:hover { transform: translateY(-2px); }
+.shop-item-clickable .shop-buy-btn:active { transform: scale(0.97); }
+.shop-buy-btn-disabled { opacity: 0.45; cursor: inherit; }
 .shop-buy-cost { font-size: 0.8rem; }
 .shop-buy-label { font-size: 0.9rem; }
 

@@ -166,11 +166,19 @@ describe('useAuth', () => {
     it('returns success and sets currentUser when createUser succeeds', async () => {
       mockStorage.createUser.mockResolvedValue(undefined)
       const { result, unmount } = await renderHookCustom(() => useAuth())
+      await act(async () => { await new Promise(r => setTimeout(r, 0)) })
 
-      const res = await result.current.login('bob', '5678')
+      let res!: { success: boolean; error?: string }
+      await act(async () => { res = await result.current.login('bob', '5678') })
       expect(res.success).toBe(true)
-      expect(result.current.currentUser).toBe('bob')
       expect(saveUser).toHaveBeenCalledWith('bob', '5678')
+
+      // Simulate Firebase firing onAuthStateChanged after sign-in
+      await act(async () => {
+        authStateCallback?.({ email: 'bob@matte.kort' })
+        await new Promise(r => setTimeout(r, 0))
+      })
+      expect(result.current.currentUser).toBe('bob')
       unmount()
     })
   })
@@ -180,10 +188,18 @@ describe('useAuth', () => {
       mockStorage.createUser.mockRejectedValue({ code: 'auth/email-already-in-use' })
       mockStorage.validatePin.mockResolvedValue(true)
       const { result, unmount } = await renderHookCustom(() => useAuth())
+      await act(async () => { await new Promise(r => setTimeout(r, 0)) })
 
-      const res = await result.current.login('alice', '1234')
+      let res!: { success: boolean; error?: string }
+      await act(async () => { res = await result.current.login('alice', '1234') })
       expect(res.success).toBe(true)
       expect(mockStorage.validatePin).toHaveBeenCalledWith('alice', '1234')
+
+      // Simulate Firebase firing onAuthStateChanged after sign-in
+      await act(async () => {
+        authStateCallback?.({ email: 'alice@matte.kort' })
+        await new Promise(r => setTimeout(r, 0))
+      })
       expect(result.current.currentUser).toBe('alice')
       unmount()
     })
@@ -234,11 +250,14 @@ describe('useAuth', () => {
 
   describe('logout', () => {
     it('calls signOut and clears currentUser', async () => {
-      mockStorage.createUser.mockResolvedValue(undefined)
       const { result, unmount } = await renderHookCustom(() => useAuth())
+      await act(async () => { await new Promise(r => setTimeout(r, 0)) })
 
-      // Log in first
-      await result.current.login('alice', '1234')
+      // Simulate being signed in via Firebase auth state change
+      await act(async () => {
+        authStateCallback?.({ email: 'alice@matte.kort' })
+        await new Promise(r => setTimeout(r, 0))
+      })
       expect(result.current.currentUser).toBe('alice')
 
       // Log out

@@ -160,6 +160,10 @@ describe('storage.firebase', () => {
         credits: 0,
         peekSavers: 0,
         purchaseCounts: {},
+        activeCategories: null,
+        creditsEnabled: true,
+        spaceVideos: {},
+        hiddenVideos: [],
       })
     })
 

@@ -7,6 +7,7 @@ const { mockStorage } = vi.hoisted(() => ({
   mockStorage: {
     addCredits: vi.fn().mockResolvedValue(undefined),
     addPeekSavers: vi.fn().mockResolvedValue(undefined),
+    getUser: vi.fn().mockResolvedValue({ creditsEnabled: true }),
   },
 }))
 

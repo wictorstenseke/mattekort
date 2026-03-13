@@ -40,7 +40,6 @@ export function VideoTab({
       })
     })
     return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [videos])
 
   async function handleAdd() {

@@ -44,6 +44,10 @@ export const firebaseStorageAdapter: StorageAdapter = {
       credits: data.credits ?? 0,
       peekSavers: data.peekSavers ?? 0,
       purchaseCounts: data.purchaseCounts ?? {},
+      activeCategories: data.activeCategories ?? null,
+      creditsEnabled: data.creditsEnabled ?? true,
+      spaceVideos: data.spaceVideos ?? {},
+      hiddenVideos: data.hiddenVideos ?? [],
     }
   },
 

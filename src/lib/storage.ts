@@ -20,6 +20,7 @@ export interface UserData {
   activeCategories?: number[] | null
   creditsEnabled?: boolean
   spaceVideos?: Record<string, string[]>
+  hiddenVideos?: string[]
 }
 
 export type UserRole = 'superuser' | 'admin' | 'user'
@@ -40,6 +41,7 @@ export interface SpaceConfig {
   activeCategories: number[] | null
   creditsEnabled: boolean
   videos: Record<string, string[]>
+  hiddenVideos: string[]
 }
 
 export interface SpaceUser {
@@ -55,7 +57,7 @@ export interface AdminStorageAdapter {
   createSpaceUser(username: string, pin: string): Promise<void>
   getSpaceConfig(): Promise<SpaceConfig | null>
   updateSpaceConfig(config: Partial<SpaceConfig>): Promise<void>
-  propagateSpaceConfig(fields: Pick<UserData, 'activeCategories' | 'creditsEnabled' | 'spaceVideos'>): Promise<void>
+  propagateSpaceConfig(fields: Pick<UserData, 'activeCategories' | 'creditsEnabled' | 'spaceVideos' | 'hiddenVideos'>): Promise<void>
   listAdmins(): Promise<UserProfile[]>
   createAdmin(username: string, pin: string): Promise<void>
 }

@@ -116,6 +116,7 @@ export const firebaseAdminStorageAdapter: AdminStorageAdapter = {
       activeCategories: d.activeCategories ?? null,
       creditsEnabled: d.creditsEnabled ?? true,
       videos: d.videos ?? {},
+      hiddenVideos: d.hiddenVideos ?? [],
     }
   },
 

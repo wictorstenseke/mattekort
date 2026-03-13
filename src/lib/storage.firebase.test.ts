@@ -3,10 +3,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 const {
   mockCreateUser, mockSignIn,
   mockGetDoc, mockSetDoc, mockUpdateDoc, mockDoc, mockArrayUnion,
+  mockBatchSet, mockBatchCommit, mockWriteBatch,
   mockAuth, mockDb,
 } = vi.hoisted(() => {
   const mockAuth: { currentUser: { uid: string } | null } = { currentUser: null }
   const mockDb = {}
+  const mockBatchSet = vi.fn()
+  const mockBatchCommit = vi.fn().mockResolvedValue(undefined)
+  const mockWriteBatch = vi.fn(() => ({ set: mockBatchSet, commit: mockBatchCommit }))
   return {
     mockCreateUser: vi.fn(),
     mockSignIn: vi.fn(),
@@ -15,6 +19,9 @@ const {
     mockUpdateDoc: vi.fn(),
     mockDoc: vi.fn(),
     mockArrayUnion: vi.fn((...args: unknown[]) => ({ __arrayUnion: args })),
+    mockBatchSet,
+    mockBatchCommit,
+    mockWriteBatch,
     mockAuth,
     mockDb,
   }
@@ -31,6 +38,8 @@ vi.mock('firebase/firestore', () => ({
   updateDoc: (...args: unknown[]) => mockUpdateDoc(...args),
   doc: (...args: unknown[]) => mockDoc(...args),
   arrayUnion: (...args: unknown[]) => mockArrayUnion(...args),
+  writeBatch: (_db: unknown) => mockWriteBatch(),
+  serverTimestamp: () => ({ __serverTimestamp: true }),
 }))
 
 vi.mock('./firebase', () => ({
@@ -62,12 +71,14 @@ describe('storage.firebase', () => {
       )
     })
 
-    it('creates a Firestore user doc with empty tables', async () => {
+    it('creates a Firestore user doc with empty tables via batch', async () => {
       mockCreateUser.mockResolvedValue({ user: { uid: 'new-uid' } })
 
       await firebaseStorageAdapter.createUser('alice', '1234')
 
-      expect(mockSetDoc).toHaveBeenCalledWith('doc-ref', { tables: {}, credits: 0, peekSavers: 0, purchaseCounts: {} })
+      expect(mockWriteBatch).toHaveBeenCalled()
+      expect(mockBatchSet).toHaveBeenCalledWith('doc-ref', { tables: {}, credits: 0, peekSavers: 0, purchaseCounts: {} })
+      expect(mockBatchCommit).toHaveBeenCalled()
     })
   })
 
@@ -149,6 +160,10 @@ describe('storage.firebase', () => {
         credits: 0,
         peekSavers: 0,
         purchaseCounts: {},
+        activeCategories: null,
+        creditsEnabled: true,
+        spaceVideos: {},
+        hiddenVideos: [],
       })
     })
 

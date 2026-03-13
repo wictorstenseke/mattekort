@@ -1,16 +1,20 @@
 import { useState, useCallback, useEffect } from 'preact/hooks'
 import { getFirebaseAuth } from '../lib/firebase'
 import { storage } from '../lib/storageContext'
+import { adminStorage } from '../lib/storageContext'
 import { emailToUsername } from '../lib/constants'
 import { saveUser } from '../lib/savedUsers'
+import type { UserRole } from '../lib/storage'
 
 interface AuthState {
   currentUser: string | null
   authReady: boolean
+  role: UserRole | null
+  spaceId: string | null
 }
 
 export function useAuth() {
-  const [state, setState] = useState<AuthState>({ currentUser: null, authReady: false })
+  const [state, setState] = useState<AuthState>({ currentUser: null, authReady: false, role: null, spaceId: null })
 
   useEffect(() => {
     let unsub: (() => void) | null = null
@@ -20,9 +24,18 @@ export function useAuth() {
       const auth = await getFirebaseAuth()
       const { onAuthStateChanged } = await import('firebase/auth')
       if (cancelled) return
-      unsub = onAuthStateChanged(auth, (user) => {
+      unsub = onAuthStateChanged(auth, async (user) => {
         const username = user ? emailToUsername(user.email) : null
-        setState({ currentUser: username, authReady: true })
+        if (user && username) {
+          try {
+            const profile = await adminStorage.getMyProfile()
+            setState({ currentUser: username, authReady: true, role: profile?.role ?? 'user', spaceId: profile?.spaceId ?? null })
+          } catch {
+            setState({ currentUser: username, authReady: true, role: 'user', spaceId: null })
+          }
+        } else {
+          setState({ currentUser: null, authReady: true, role: null, spaceId: null })
+        }
       })
     }
 
@@ -62,7 +75,6 @@ export function useAuth() {
     }
 
     saveUser(trimmed, pin)
-    setState(s => ({ ...s, currentUser: trimmed }))
     return { success: true }
   }, [])
 
@@ -70,12 +82,14 @@ export function useAuth() {
     const auth = await getFirebaseAuth()
     const { signOut } = await import('firebase/auth')
     await signOut(auth)
-    setState(s => ({ ...s, currentUser: null }))
+    setState({ currentUser: null, authReady: true, role: null, spaceId: null })
   }, [])
 
   return {
     currentUser: state.currentUser,
     authReady: state.authReady,
+    role: state.role,
+    spaceId: state.spaceId,
     login,
     logout,
   }

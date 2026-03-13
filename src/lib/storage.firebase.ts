@@ -44,6 +44,10 @@ export const firebaseStorageAdapter: StorageAdapter = {
       credits: data.credits ?? 0,
       peekSavers: data.peekSavers ?? 0,
       purchaseCounts: data.purchaseCounts ?? {},
+      activeCategories: data.activeCategories ?? null,
+      creditsEnabled: data.creditsEnabled ?? true,
+      spaceVideos: data.spaceVideos ?? {},
+      hiddenVideos: data.hiddenVideos ?? [],
     }
   },
 
@@ -59,9 +63,22 @@ export const firebaseStorageAdapter: StorageAdapter = {
     const auth = await getFirebaseAuth()
     const { createUserWithEmailAndPassword } = await import('firebase/auth')
     const db = await getFirebaseDb()
-    const { doc, setDoc } = await import('firebase/firestore')
+    const { doc, writeBatch, serverTimestamp } = await import('firebase/firestore')
     const cred = await createUserWithEmailAndPassword(auth, fakeEmail(username), pinToPassword(pin))
-    await setDoc(doc(db, 'users', cred.user.uid), { tables: {}, credits: 0, peekSavers: 0, purchaseCounts: {} })
+    const uid = cred.user.uid
+    const batch = writeBatch(db)
+    batch.set(doc(db, 'users', uid), { tables: {}, credits: 0, peekSavers: 0, purchaseCounts: {} })
+    batch.set(doc(db, 'profiles', uid), {
+      uid,
+      username,
+      role: 'user',
+      spaceId: null,
+      pin,
+      createdAt: serverTimestamp(),
+      createdBy: 'self',
+    })
+    batch.set(doc(db, 'usernames', username), { uid })
+    await batch.commit()
   },
 
   async logCompletion(_: string, table: number): Promise<void> {

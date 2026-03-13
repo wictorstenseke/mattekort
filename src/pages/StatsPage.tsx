@@ -13,6 +13,7 @@ interface StatsPageProps {
   onStats: () => void
   onShop: () => void
   onLogout: () => void
+  onSuperuser?: () => void
 }
 
 interface Stats {
@@ -117,7 +118,7 @@ function HighlightRow({ icon, color, title, value }: { icon: string; color: stri
   )
 }
 
-export function StatsPage({ user, onBack, onStats, onShop, onLogout }: StatsPageProps) {
+export function StatsPage({ user, onBack, onStats, onShop, onLogout, onSuperuser }: StatsPageProps) {
   const [stats, setStats] = useState<Stats | null>(null)
   const [completionLog, setCompletionLog] = useState<CompletionEntry[]>([])
   const [showHistory, setShowHistory] = useState(false)
@@ -145,7 +146,7 @@ export function StatsPage({ user, onBack, onStats, onShop, onLogout }: StatsPage
     return (
       <div class="screen active stats-screen">
         <TopHeader showBack onBack={onBack} maxWidth="900px">
-          <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="stats" />
+          <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="stats" onSuperuser={onSuperuser} />
         </TopHeader>
         <h1 class="page-title w-full max-w-[900px]">📊 Statistik</h1>
         <p class="stats-empty">Kunde inte ladda statistiken. Försök igen!</p>
@@ -172,7 +173,7 @@ export function StatsPage({ user, onBack, onStats, onShop, onLogout }: StatsPage
         <button type="button" class="stats-chip" onClick={() => setShowHistory(true)}>
           📋 Historik
         </button>
-        <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="stats" />
+        <UserMenuChip user={user} onHome={onBack} onStats={onStats} onShop={onShop} onLogout={onLogout} variant="stats" onSuperuser={onSuperuser} />
       </TopHeader>
 
       <h1 class="page-title w-full max-w-[900px]">📊 Statistik</h1>

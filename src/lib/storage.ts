@@ -17,6 +17,49 @@ export interface UserData {
   peekSavers?: number
   /** Maps item key (video ID or "peekSaver") to number of times purchased. */
   purchaseCounts?: Record<string, number>
+  activeCategories?: number[] | null
+  creditsEnabled?: boolean
+  spaceVideos?: Record<string, string[]>
+  hiddenVideos?: string[]
+}
+
+export type UserRole = 'superuser' | 'admin' | 'user'
+
+export interface UserProfile {
+  uid: string
+  username: string
+  role: UserRole
+  spaceId: string | null
+  pin: string
+  createdAt: number
+  createdBy: string
+}
+
+export interface SpaceConfig {
+  adminUid: string
+  adminUsername: string
+  activeCategories: number[] | null
+  creditsEnabled: boolean
+  videos: Record<string, string[]>
+  hiddenVideos: string[]
+}
+
+export interface SpaceUser {
+  uid: string
+  username: string
+  profile: UserProfile
+  gameData: UserData | null
+}
+
+export interface AdminStorageAdapter {
+  getMyProfile(): Promise<UserProfile | null>
+  listSpaceUsers(): Promise<SpaceUser[]>
+  createSpaceUser(username: string, pin: string): Promise<void>
+  getSpaceConfig(): Promise<SpaceConfig | null>
+  updateSpaceConfig(config: Partial<SpaceConfig>): Promise<void>
+  propagateSpaceConfig(fields: Pick<UserData, 'activeCategories' | 'creditsEnabled' | 'spaceVideos' | 'hiddenVideos'>): Promise<void>
+  listAdmins(): Promise<UserProfile[]>
+  createAdmin(username: string, pin: string): Promise<void>
 }
 
 export interface StorageAdapter {

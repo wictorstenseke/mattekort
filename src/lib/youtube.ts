@@ -54,6 +54,26 @@ export function buildEmbedUrl(videoId: string): string {
 }
 
 /**
+ * Extracts an 11-character YouTube video ID from a URL or bare ID.
+ * Supports youtube.com/watch?v=, youtu.be/, and /embed/ formats.
+ * Returns null if the input cannot be parsed.
+ */
+export function extractYouTubeId(input: string): string | null {
+  const trimmed = input.trim()
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed
+  try {
+    const url = new URL(trimmed)
+    return (
+      url.searchParams.get('v') ??
+      (url.hostname === 'youtu.be' ? url.pathname.slice(1) : null) ??
+      (url.pathname.match(/\/embed\/([a-zA-Z0-9_-]{11})/)?.[1] ?? null)
+    )
+  } catch {
+    return null
+  }
+}
+
+/**
  * Fetches the title of a YouTube video via the public oEmbed API.
  * No API key required. Returns null on any failure.
  */

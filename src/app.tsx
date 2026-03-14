@@ -5,11 +5,20 @@ import { LoginPage } from './pages/LoginPage'
 import { HomePage } from './pages/HomePage'
 import type { RoundResult } from './hooks/useGame'
 
-const GamePage = lazy(() => import('./pages/GamePage'))
-const CompletePage = lazy(() => import('./pages/CompletePage'))
-const StatsPage = lazy(() => import('./pages/StatsPage'))
-const ShopPage = lazy(() => import('./pages/ShopPage'))
-const AdminPage = lazy(() => import('./pages/AdminPage'))
+function lazyWithReload<T>(factory: () => Promise<{ default: T }>) {
+  return lazy(() =>
+    factory().catch(() => {
+      window.location.reload()
+      return new Promise<{ default: T }>(() => {})
+    })
+  )
+}
+
+const GamePage = lazyWithReload(() => import('./pages/GamePage'))
+const CompletePage = lazyWithReload(() => import('./pages/CompletePage'))
+const StatsPage = lazyWithReload(() => import('./pages/StatsPage'))
+const ShopPage = lazyWithReload(() => import('./pages/ShopPage'))
+const AdminPage = lazyWithReload(() => import('./pages/AdminPage'))
 
 type Screen = 'login' | 'home' | 'game' | 'complete' | 'stats' | 'shop' | 'admin' | 'superuser'
 

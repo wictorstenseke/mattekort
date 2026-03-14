@@ -15,6 +15,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         cleanupOutdatedCaches: true,
+        navigateFallback: 'index.html',
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.mode === 'navigate',

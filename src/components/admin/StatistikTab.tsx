@@ -4,6 +4,7 @@ import type { SpaceUser } from '../../lib/storage'
 
 export function StatistikTab({ users }: { users: SpaceUser[] }) {
   const [expanded, setExpanded] = useState<string | null>(null)
+  const [visibleCount, setVisibleCount] = useState<Record<string, number>>({})
   return (
     <div class="flex flex-col gap-2">
       <h2 class="text-lg font-bold text-(--text)">Statistik</h2>
@@ -47,23 +48,38 @@ export function StatistikTab({ users }: { users: SpaceUser[] }) {
                         </div>
                       ))}
                     </div>
-                    {completions.length > 0 && (
-                      <div class="mt-3">
-                        <p class="text-sm font-medium text-(--text-muted) mb-2">Senaste 5 avklarade</p>
-                        <div class="flex flex-col gap-1">
-                          {[...completions].reverse().slice(0, 5).map((entry, i) => {
-                            const cat = ALL_CATEGORIES.find(c => c.id === entry.table)
-                            return (
-                              <div key={i} class="flex items-center gap-2 text-xs text-(--text-muted)">
-                                <span>{cat?.emoji ?? '?'}</span>
-                                <span>{cat?.label ?? entry.table}</span>
-                                <span class="ml-auto">{new Date(entry.timestamp).toLocaleDateString('sv-SE')}</span>
-                              </div>
-                            )
-                          })}
+                    {completions.length > 0 && (() => {
+                      const limit = visibleCount[u.uid] ?? 5
+                      const reversed = [...completions].reverse()
+                      const shown = reversed.slice(0, limit)
+                      const hasMore = reversed.length > limit
+                      return (
+                        <div class="mt-3">
+                          <p class="text-sm font-medium text-(--text-muted) mb-2">Avklarade utmaningar</p>
+                          <div class="flex flex-col gap-1">
+                            {shown.map((entry, i) => {
+                              const cat = ALL_CATEGORIES.find(c => c.id === entry.table)
+                              return (
+                                <div key={i} class="flex items-center gap-2 text-xs text-(--text-muted)">
+                                  <span>{cat?.emoji ?? '?'}</span>
+                                  <span>{cat?.label ?? entry.table}</span>
+                                  <span class="ml-auto">{new Date(entry.timestamp).toLocaleDateString('sv-SE')}</span>
+                                </div>
+                              )
+                            })}
+                          </div>
+                          {hasMore && (
+                            <button
+                              type="button"
+                              class="mt-2 text-xs text-(--text-muted) underline cursor-pointer"
+                              onClick={() => setVisibleCount(prev => ({ ...prev, [u.uid]: limit + 5 }))}
+                            >
+                              Visa 5 till
+                            </button>
+                          )}
                         </div>
-                      </div>
-                    )}
+                      )
+                    })()}
                   </>
                 )}
               </div>

@@ -118,7 +118,7 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop, role,
         {/* Operation tabs */}
         <div class="relative max-sm:portrait:-mx-5">
           <div class="hidden max-sm:portrait:block absolute left-0 top-0 bottom-0 w-10 bg-linear-to-r from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtStart ? 'opacity:0' : ''} />
-          <div ref={tabsScrollRef} class="flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div ref={tabsScrollRef} class="flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-5 max-sm:portrait:py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {TABS.map(tab => {
               const active = activeOp === tab.op
               return (

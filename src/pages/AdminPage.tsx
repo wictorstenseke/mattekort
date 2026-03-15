@@ -173,19 +173,21 @@ export default function AdminPage({ role, user, onLogout, onBack, onStats, onSho
 
       {/* Tab bar */}
       <div class="px-4 py-2 shrink-0 max-sm:portrait:px-0 max-sm:portrait:py-0">
-        <div class="max-w-2xl mx-auto w-full min-w-0 flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-4 max-sm:portrait:py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setTab(t.id)}
-              aria-current={tab === t.id ? 'page' : undefined}
-              class={`op-tab shrink-0 py-1.5 px-5 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${tab === t.id ? 'active text-white' : 'bg-(--surface) text-(--text-secondary)'}`}
-              style={tab === t.id ? 'background: linear-gradient(135deg, #FF6B6B, #FF9A3C); box-shadow: 0 3px 12px rgba(0,0,0,.15);' : 'box-shadow: 0 0 0 2px var(--border), 0 2px 8px rgba(0,0,0,.08);'}
-            >
-              {t.label}
-            </button>
-          ))}
+        <div class="max-sm:portrait:-my-5">
+          <div class="max-w-2xl mx-auto w-full min-w-0 flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-4 max-sm:portrait:py-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {tabs.map(t => (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                aria-current={tab === t.id ? 'page' : undefined}
+                class={`op-tab shrink-0 py-1.5 px-5 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${tab === t.id ? 'active text-white' : 'bg-(--surface) text-(--text-secondary)'}`}
+                style={tab === t.id ? 'background: linear-gradient(135deg, #FF6B6B, #FF9A3C); box-shadow: 0 3px 12px rgba(0,0,0,.15);' : 'box-shadow: 0 0 0 2px var(--border), 0 2px 8px rgba(0,0,0,.08);'}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -194,7 +196,7 @@ export default function AdminPage({ role, user, onLogout, onBack, onStats, onSho
       )}
 
       {/* Content */}
-      <div class="flex-1 overflow-y-auto px-4 pb-8 pt-2">
+      <div class="flex-1 overflow-y-auto px-4 pb-8 pt-2 max-sm:portrait:pt-4">
         <div class="max-w-2xl mx-auto w-full">
           {loading ? (
             <div class="flex items-center justify-center py-12 text-(--text-muted)">Laddar...</div>

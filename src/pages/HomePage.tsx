@@ -117,24 +117,26 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop, role,
       <div class="flex-1 flex flex-col justify-center landscape:justify-start landscape:pt-[80px] w-full max-w-[900px] max-sm:portrait:justify-start gap-6">
         {/* Operation tabs */}
         <div class="relative max-sm:portrait:-mx-5">
-          <div class="hidden max-sm:portrait:block absolute left-0 top-0 bottom-0 w-10 bg-linear-to-r from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtStart ? 'opacity:0' : ''} />
-          <div ref={tabsScrollRef} class="flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-5 max-sm:portrait:py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {TABS.map(tab => {
-              const active = activeOp === tab.op
-              return (
-                <button
-                  key={tab.op}
-                  type="button"
-                                    class={`op-tab shrink-0 py-1.5 px-5 max-sm:portrait:px-3 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${active ? 'active text-white' : 'bg-(--surface) text-(--text-secondary)'}`}
-                  style={active ? `background:${tab.gradient}; box-shadow: 0 3px 12px rgba(0,0,0,.15);` : 'box-shadow: 0 0 0 2px var(--border), 0 2px 8px rgba(0,0,0,.08);'}
-                  onClick={() => handleTabChange(tab.op)}
-                >
-                  {tab.label}
-                </button>
-              )
-            })}
+          <div class="max-sm:portrait:-my-5">
+            <div class="hidden max-sm:portrait:block absolute left-0 top-0 bottom-0 w-10 bg-linear-to-r from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtStart ? 'opacity:0' : ''} />
+            <div ref={tabsScrollRef} class="flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-5 max-sm:portrait:py-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {TABS.map(tab => {
+                const active = activeOp === tab.op
+                return (
+                  <button
+                    key={tab.op}
+                    type="button"
+                    class={`op-tab shrink-0 py-1.5 px-5 max-sm:portrait:px-3 min-h-9 rounded-xl font-[Nunito] text-[0.9rem] font-bold text-center cursor-pointer touch-manipulation outline-none ${active ? 'active text-white' : 'bg-(--surface) text-(--text-secondary)'}`}
+                    style={active ? `background:${tab.gradient}; box-shadow: 0 3px 12px rgba(0,0,0,.15);` : 'box-shadow: 0 0 0 2px var(--border), 0 2px 8px rgba(0,0,0,.08);'}
+                    onClick={() => handleTabChange(tab.op)}
+                  >
+                    {tab.label}
+                  </button>
+                )
+              })}
+            </div>
+            <div class="hidden max-sm:portrait:block absolute right-0 top-0 bottom-0 w-10 bg-linear-to-l from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtEnd ? 'opacity:0' : ''} />
           </div>
-          <div class="hidden max-sm:portrait:block absolute right-0 top-0 bottom-0 w-10 bg-linear-to-l from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtEnd ? 'opacity:0' : ''} />
         </div>
 
         <div class="grid gap-6 w-full max-w-[900px] op-content grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">

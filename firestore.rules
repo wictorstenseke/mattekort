@@ -35,7 +35,7 @@ service cloud.firestore {
     }
 
     match /usernames/{username} {
-      allow read: if true;
+      allow read: if request.auth != null;
       allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
     }
 

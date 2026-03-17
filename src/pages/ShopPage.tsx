@@ -45,7 +45,7 @@ declare global {
             onStateChange?: (event: { data: number }) => void
           }
         }
-      ) => { destroy(): void }
+      ) => { destroy(): void; pauseVideo(): void; playVideo(): void; getPlayerState(): number }
     }
     onYouTubeIframeAPIReady: (() => void) | undefined
   }
@@ -83,6 +83,8 @@ export function ShopPage({ user, onBack, onStats, onLogout, onSuperuser }: ShopP
   const [videoEnded, setVideoEnded] = useState(false)
   const [isExpanded, setIsExpanded] = useState(false)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
+  const playerRef = useRef<{ destroy(): void; pauseVideo(): void; playVideo(): void; getPlayerState(): number } | null>(null)
 
   // Video titles fetched from YouTube oEmbed
   const [videoTitles, setVideoTitles] = useState<Record<string, string>>({})
@@ -208,22 +210,33 @@ export function ShopPage({ user, onBack, onStats, onLogout, onSuperuser }: ShopP
   // YouTube player for shop video
   useEffect(() => {
     if (!playingVideoId) return
-    let player: { destroy(): void } | null = null
 
     loadYouTubeApi(() => {
-      player = new window.YT.Player('yt-shop-player', {
+      playerRef.current = new window.YT.Player('yt-shop-player', {
         events: {
           onStateChange: (event: { data: number }) => {
             if (event.data === 0) setVideoEnded(true)
+            // 1 = playing, 2 = paused
+            setIsPaused(event.data === 2)
           },
         },
       })
     })
 
     return () => {
-      player?.destroy()
+      playerRef.current?.destroy()
+      playerRef.current = null
     }
   }, [playingVideoId])
+
+  const handleVideoTap = useCallback(() => {
+    if (!playerRef.current || videoEnded) return
+    if (playerRef.current.getPlayerState() === 1) {
+      playerRef.current.pauseVideo()
+    } else {
+      playerRef.current.playVideo()
+    }
+  }, [videoEnded])
 
   if (playingVideoId) {
     return (
@@ -238,6 +251,15 @@ export function ShopPage({ user, onBack, onStats, onLogout, onSuperuser }: ShopP
             frameBorder="0"
             class="yt-iframe"
           />
+          {!videoEnded && (
+            <div
+              class="yt-tap-overlay"
+              onClick={handleVideoTap}
+              aria-label={isPaused ? 'Spela upp' : 'Pausa'}
+            >
+              {isPaused && <div class="yt-pause-indicator">▶</div>}
+            </div>
+          )}
           {videoEnded && (
             <div class="yt-ended-overlay">
               <span class="yt-ended-emoji">🎬</span>
@@ -246,30 +268,30 @@ export function ShopPage({ user, onBack, onStats, onLogout, onSuperuser }: ShopP
           )}
         </div>
         <div class="video-action-btns">
+          <button class="video-chip-btn video-chip-btn--left" onClick={() => setShowExitConfirm(true)}>
+            Tillbaka till affären
+          </button>
           <button
-            class="video-back-btn-outline"
+            class="video-chip-btn video-chip-btn--right"
             onClick={() => setIsExpanded(v => !v)}
             aria-label={isExpanded ? 'Zooma ut' : 'Zooma in'}
           >
-            {isExpanded ? '⊖ Zooma ut' : '⊕ Zooma in'}
-          </button>
-          <button class="video-back-btn-outline" onClick={() => setShowExitConfirm(true)}>
-            Tillbaka till affären
+            {isExpanded ? '🔍 Zooma ut' : '🔍 Zooma in'}
           </button>
         </div>
         <Modal
           isOpen={showExitConfirm}
           onClose={() => setShowExitConfirm(false)}
-          title="Lämna video?"
-          ariaLabel="Bekräfta att lämna video"
+          title="Stäng av video?"
+          ariaLabel="Bekräfta att stänga av video"
           closeAriaLabel="Stäng"
-          className="shop-confirm-modal"
+          className="shop-confirm-modal shop-confirm-modal--video"
         >
           <div class="shop-confirm-body">
-            <p class="shop-confirm-item-name">Vill du lämna videon och gå tillbaka till affären?</p>
+            <p class="shop-confirm-item-name">Vill du stänga av videon och gå tillbaka till affären?</p>
             <div class="shop-confirm-actions">
-              <button class="btn-secondary" onClick={() => setShowExitConfirm(false)}>Stanna kvar</button>
-              <button class="btn-primary" onClick={() => { setPlayingVideoId(null); setShowExitConfirm(false); }}>Lämna video</button>
+              <button class="btn-secondary" onClick={() => setShowExitConfirm(false)}>Fortsätt titta</button>
+              <button class="btn-primary" onClick={() => { setPlayingVideoId(null); setShowExitConfirm(false); }}>Stäng av</button>
             </div>
           </div>
         </Modal>

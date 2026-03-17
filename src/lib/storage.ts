@@ -3,6 +3,10 @@ export interface TableData {
   clear: number[]
   retry: number[]
   cardEquations?: Record<number, { a: number; b: number }>
+  /** Per-card operation, used in Blanda mode. */
+  cardOperations?: Record<number, string>
+  /** Per-card category ID, used in Blanda mode. */
+  cardCategoryIds?: Record<number, number>
 }
 
 export interface CompletionEntry {

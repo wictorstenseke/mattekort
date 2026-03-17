@@ -226,6 +226,15 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .op-tab { transition: background .2s ease, color .2s ease, box-shadow .2s ease, transform .2s ease; }
 .op-tab:hover { transform: scale(1.02); }
 .op-tab.active { border: none !important; box-shadow: 0 3px 12px rgba(0,0,0,.15); }
+.blanda-chip { position: relative; align-items: center; gap: 6px; padding: 6px 12px; min-height: 36px; border: none; border-radius: 12px; background: linear-gradient(135deg, #FF6B6B, #C77DFF, #4D96FF); color: white; font-family: 'Nunito', sans-serif; font-size: 0.9rem; font-weight: 700; cursor: pointer; box-shadow: 0 3px 14px rgba(199, 125, 255, 0.45); transition: transform .2s ease, box-shadow .2s ease; touch-action: manipulation; white-space: nowrap; }
+.blanda-chip:hover { transform: scale(1.04); box-shadow: 0 5px 18px rgba(199, 125, 255, 0.55); }
+.blanda-chip:active { transform: scale(.96); }
+/* Scroll-only: visible only on small portrait screens (inside scrollable tabs) */
+.blanda-chip--scroll-only { display: none; }
+@media (max-width: 639px) and (orientation: portrait) { .blanda-chip--scroll-only { display: inline-flex; } }
+/* Desktop-only: hidden on small portrait screens (right-aligned) */
+@media (max-width: 639px) and (orientation: portrait) { .blanda-chip--desktop-only { display: none !important; } }
+.blanda-chip-progress { background: rgba(255,255,255,0.25); border-radius: 8px; padding: 1px 7px; font-size: 0.75rem; font-weight: 700; }
 
 /* TABLE CARD */
 .table-card { display: flex; flex-direction: column; background: var(--surface); border-radius: var(--radius); padding: 24px 16px 20px; text-align: center; box-shadow: 0 4px 16px rgba(0, 0, 0, .08); cursor: pointer; transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden; border-top: 5px solid var(--tc); }
@@ -395,13 +404,17 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .yt-iframe-wrap--expanded { max-width: 100%; border-radius: 0; }
 .yt-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block; border-radius: 16px; }
 .yt-iframe-wrap--expanded .yt-iframe { border-radius: 0; }
+.yt-tap-overlay { position: absolute; inset: 0; z-index: 5; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.yt-pause-indicator { width: 72px; height: 72px; border-radius: 50%; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: white; pointer-events: none; }
 .yt-ended-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.92); pointer-events: all; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; z-index: 10; }
 .yt-ended-emoji { font-size: 3rem; }
 .yt-ended-msg { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: white; margin: 0; }
-.video-action-btns { width: 100%; max-width: 720px; display: flex; flex-direction: column; gap: 12px; }
-.video-back-btn-outline { width: 100%; min-height: 56px; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.45); border-radius: 14px; background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.92); font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 700; cursor: pointer; transition: background .2s, border-color .2s, transform .15s; touch-action: manipulation; }
-.video-back-btn-outline:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.65); }
-.video-back-btn-outline:active { transform: scale(.98); }
+.video-action-btns { width: 100%; max-width: 720px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center; }
+.video-chip-btn--left { margin-right: auto; }
+.video-chip-btn--right { margin-left: auto; }
+.video-chip-btn { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 44px; padding: 8px 16px; border: 2px solid rgba(255, 255, 255, 0.45); border-radius: 12px; background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.92); font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background .2s, border-color .2s, transform .15s; touch-action: manipulation; white-space: nowrap; }
+.video-chip-btn:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(255, 255, 255, 0.65); transform: scale(1.02); }
+.video-chip-btn:active { transform: scale(.98); }
 
 /* ANIMATIONS */
 @keyframes popIn { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: scale(1); } }
@@ -504,6 +517,7 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 
 /* SHOP CONFIRM MODAL */
 .shop-confirm-modal { max-width: 320px; }
+.shop-confirm-modal--video { max-width: 420px; }
 .shop-confirm-body { padding: 16px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
 .shop-confirm-item-icon { font-size: 3rem; }
 .shop-confirm-item-name { font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 1.2rem; color: var(--text); margin: 0; }

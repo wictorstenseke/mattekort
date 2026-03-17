@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'preact/hooks'
 import { BalanceChip } from '../components/BalanceChip'
 import { UserMenuChip } from '../components/UserMenuChip'
-import { MULTIPLY_CATEGORIES, PLUS_CATEGORIES, MINUS_CATEGORIES, DIVIDE_CATEGORIES } from '../lib/constants'
+import { MULTIPLY_CATEGORIES, PLUS_CATEGORIES, MINUS_CATEGORIES, DIVIDE_CATEGORIES, BLANDA_TABLE_ID } from '../lib/constants'
 import type { Operation, CategoryDef } from '../lib/constants'
 import { storage } from '../lib/storageContext'
 import type { TableData, UserRole } from '../lib/storage'
@@ -115,9 +115,9 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop, role,
       </div>
 
       <div class="flex-1 flex flex-col justify-center landscape:justify-start landscape:pt-[80px] w-full max-w-[900px] max-sm:portrait:justify-start gap-6">
-        {/* Operation tabs */}
-        <div class="relative max-sm:portrait:-mx-5">
-          <div class="max-sm:portrait:-my-5">
+        {/* Operation tabs + Blanda chip */}
+        <div class="flex items-center gap-2 max-sm:portrait:-mx-5">
+          <div class="flex-1 min-w-0 relative max-sm:portrait:-my-5">
             <div class="hidden max-sm:portrait:block absolute left-0 top-0 bottom-0 w-10 bg-linear-to-r from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtStart ? 'opacity:0' : ''} />
             <div ref={tabsScrollRef} class="flex flex-wrap gap-1.5 max-sm:portrait:flex-nowrap max-sm:portrait:overflow-x-auto max-sm:portrait:px-5 max-sm:portrait:py-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {TABS.map(tab => {
@@ -134,9 +134,41 @@ export function HomePage({ user, onSelectTable, onLogout, onStats, onShop, role,
                   </button>
                 )
               })}
+              {/* Blanda inside scroll — small portrait only */}
+              {(() => {
+                const blandaTd = tablesData[BLANDA_TABLE_ID]
+                const clearN = blandaTd?.clear.length ?? 0
+                const inProgress = clearN > 0 || (blandaTd?.retry.length ?? 0) > 0
+                return (
+                  <button
+                    type="button"
+                    class="blanda-chip shrink-0 blanda-chip--scroll-only"
+                    onClick={() => onSelectTable(BLANDA_TABLE_ID)}
+                  >
+                    🔀 Blanda
+                    {inProgress && <span class="blanda-chip-progress">{clearN}/10</span>}
+                  </button>
+                )
+              })()}
             </div>
             <div class="hidden max-sm:portrait:block absolute right-0 top-0 bottom-0 w-10 bg-linear-to-l from-(--bg) to-transparent pointer-events-none z-10 transition-opacity duration-200" style={tabsAtEnd ? 'opacity:0' : ''} />
           </div>
+          {/* Blanda right-aligned — larger screens only */}
+          {(() => {
+            const blandaTd = tablesData[BLANDA_TABLE_ID]
+            const clearN = blandaTd?.clear.length ?? 0
+            const inProgress = clearN > 0 || (blandaTd?.retry.length ?? 0) > 0
+            return (
+              <button
+                type="button"
+                class="blanda-chip inline-flex shrink-0 blanda-chip--desktop-only"
+                onClick={() => onSelectTable(BLANDA_TABLE_ID)}
+              >
+                🔀 Blanda
+                {inProgress && <span class="blanda-chip-progress">{clearN}/10</span>}
+              </button>
+            )
+          })()}
         </div>
 
         <div class="grid gap-6 w-full max-w-[900px] op-content grid-cols-[repeat(auto-fill,minmax(160px,1fr))]">

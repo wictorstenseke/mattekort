@@ -17,9 +17,8 @@ function Root() {
   return (
     <ToastProvider>
       <div style={{
-        transform: `translateY(${contentOffset}px)`,
-        transition: ptr.phase === 'idle' ? 'transform 0.3s ease-out' : 'none',
-        willChange: contentOffset > 0 ? 'transform' : 'auto',
+        marginTop: `${contentOffset}px`,
+        transition: ptr.phase === 'idle' ? 'margin-top 0.3s ease-out' : 'none',
       }}>
         <App />
       </div>

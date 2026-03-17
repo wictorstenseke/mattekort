@@ -6,6 +6,10 @@ export interface GameCard {
   fromRetry: boolean
   a?: number
   b?: number
+  /** Per-card operation override, used in Blanda mode. */
+  operation?: Operation
+  /** Per-card category ID override, used in Blanda mode. */
+  categoryId?: number
 }
 
 /** Build the initial deck for a round from saved table data. */

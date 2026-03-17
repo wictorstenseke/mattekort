@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'preact/hooks'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { TopHeader } from '../components/TopHeader'
-import { getCategoryDef } from '../lib/constants'
+import { getCategoryDef, BLANDA_TABLE_ID } from '../lib/constants'
 import { useGame } from '../hooks/useGame'
 import { NumericKeypad } from '../components/NumericKeypad'
 import { HintModal } from '../components/HintModal'
@@ -39,7 +39,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
       if (userData) {
         setPeekSavers(userData.peekSavers ?? 0)
         const activeCategories = userData.activeCategories
-        if (activeCategories != null && !activeCategories.includes(categoryId)) {
+        if (categoryId !== BLANDA_TABLE_ID && activeCategories != null && !activeCategories.includes(categoryId)) {
           onBack()
           return
         }
@@ -198,6 +198,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
   }, [flipped, showAnswerAfterWrong, handleSubmit, handleShowAnswerDismiss])
 
   const { deck, clearPile, retryPile, current, operation, question, answer, backLabel } = gameState
+  const currentOp = current?.operation ?? operation
   const done = clearPile.length + retryPile.length
   const total = deck.length + done
   const tableColor = catDef?.color ?? '#4D96FF'
@@ -223,7 +224,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
         <ThemeToggle />
       </TopHeader>
 
-      <h1 class="page-title w-full max-w-[900px] font-[Fredoka_One] text-2xl max-sm:text-xl text-(--text) mb-5 max-sm:mb-2.5">{catDef?.label ?? `Kategori ${categoryId}`}</h1>
+      <h1 class="page-title w-full max-w-[900px] font-[Fredoka_One] text-2xl max-sm:text-xl text-(--text) mb-5 max-sm:mb-2.5">{categoryId === BLANDA_TABLE_ID ? '🔀 Blanda' : (catDef?.label ?? `Kategori ${categoryId}`)}</h1>
 
       <div class="game-content flex-1 flex items-center justify-center w-full pb-4 max-sm:pb-2">
         <div class="game-layout flex flex-col items-center gap-4 w-full max-w-[900px] max-sm:gap-2.5">
@@ -252,7 +253,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
             >
               <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}${answerState === 'correct' && !showAnswerAfterWrong ? ' correct' : ''}`}>
                 <div class="card-face card-front">
-                  {operation === 'divide' && current?.a != null && current?.b != null ? (
+                  {currentOp === 'divide' && current?.a != null && current?.b != null ? (
                     <div class="card-question-division">
                       <div class="fraction-num">{current.a}</div>
                       <div class="fraction-line" />
@@ -282,7 +283,7 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
               disabled={flipped || showAnswerAfterWrong}
               user={user}
               onPeek={handlePeek}
-              onHint={handleHint}
+              onHint={categoryId === BLANDA_TABLE_ID ? undefined : handleHint}
               flipped={flipped}
               peekSavers={peekSavers}
             />

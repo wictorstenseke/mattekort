@@ -3,7 +3,7 @@ import { storage } from '../lib/storageContext'
 import type { TableData } from '../lib/storage'
 import { buildDeck, isCorrectAnswer, isCorrectTenFriendsAnswer, computeEndRound } from '../lib/game-logic'
 import type { GameCard } from '../lib/game-logic'
-import { getCategoryDef, TEN_FRIENDS_CATEGORY_ID } from '../lib/constants'
+import { getCategoryDef, TEN_FRIENDS_CATEGORY_ID, BLANDA_TABLE_ID, generateBlandaDeck, ALL_CATEGORIES } from '../lib/constants'
 import type { Operation } from '../lib/constants'
 import { opSymbol } from '../lib/hint-utils'
 
@@ -22,6 +22,8 @@ interface GameState {
   peeked: boolean
   peekUsedSaver: boolean
   busy: boolean
+  /** Per-card operation + categoryId for Blanda mode. Null for regular rounds. */
+  blandaMeta: Record<number, { operation: Operation; categoryId: number }> | null
 }
 
 export interface RoundResult {
@@ -48,15 +50,18 @@ const initialState: GameState = {
   peeked: false,
   peekUsedSaver: false,
   busy: false,
+  blandaMeta: null,
 }
 
 function computeCardDisplay(state: GameState, card: GameCard): { question: string; answer: number; backLabel: string } {
-  const a = state.operation === 'multiply' ? state.table : (card.a ?? 0)
-  const b = state.operation === 'multiply' ? card.n : (card.b ?? 0)
-  const isTenFriends = state.categoryId === TEN_FRIENDS_CATEGORY_ID && state.operation === 'add'
-  const sym = opSymbol(state.operation)
+  const op = card.operation ?? state.operation
+  const catId = card.categoryId ?? state.categoryId
+  const a = op === 'multiply' ? (card.a ?? state.table) : (card.a ?? 0)
+  const b = op === 'multiply' ? (card.b ?? card.n) : (card.b ?? 0)
+  const isTenFriends = catId === TEN_FRIENDS_CATEGORY_ID && op === 'add'
+  const sym = opSymbol(op)
   const question = isTenFriends ? `${a} + ?` : `${a} ${sym} ${b}`
-  const answer = isTenFriends ? b : state.operation === 'multiply' ? a * b : state.operation === 'add' ? a + b : state.operation === 'divide' ? a / b : a - b
+  const answer = isTenFriends ? b : op === 'multiply' ? a * b : op === 'add' ? a + b : op === 'divide' ? a / b : a - b
   const backLabel = isTenFriends ? `${a} + ${b} = 10` : `${question} = ${answer}`
   return { question, answer, backLabel }
 }
@@ -92,9 +97,89 @@ export function useGame(username: string) {
   const startGame = useCallback(async (categoryId: number) => {
     setRoundResult(null)
 
+    // --- Blanda (mix) mode ---
+    if (categoryId === BLANDA_TABLE_ID) {
+      const userData = await storage.getUser(username)
+      const tables = userData?.tables ?? {}
+      const td: TableData = tables[BLANDA_TABLE_ID] ?? { wins: 0, clear: [], retry: [] }
+
+      const activeCatIds = userData?.activeCategories ?? null
+      const availableCats = ALL_CATEGORIES.filter(cat => activeCatIds === null || activeCatIds.includes(cat.id))
+
+      let deckCards = buildDeck(td)
+      let blandaMeta: Record<number, { operation: Operation; categoryId: number }> = {}
+      let equations = new Map<number, { a: number; b: number }>()
+
+      const hasCardMeta = td.cardOperations && Object.keys(td.cardOperations).length > 0
+      if (!hasCardMeta) {
+        // Fresh start or post-allClear reset — generate a new random deck
+        deckCards = Array.from({ length: 10 }, (_, i) => ({ n: i + 1, fromRetry: false }))
+        const newEqs = generateBlandaDeck(availableCats)
+        newEqs.forEach((eq, i) => {
+          const n = i + 1
+          equations.set(n, { a: eq.a, b: eq.b })
+          blandaMeta[n] = { operation: eq.operation, categoryId: eq.categoryId }
+        })
+        const cardOperations: Record<number, string> = {}
+        const cardCategoryIds: Record<number, number> = {}
+        Object.entries(blandaMeta).forEach(([k, v]) => {
+          cardOperations[Number(k)] = v.operation
+          cardCategoryIds[Number(k)] = v.categoryId
+        })
+        await storage.saveTableData(username, BLANDA_TABLE_ID, {
+          wins: td.wins, clear: [], retry: [],
+          cardEquations: Object.fromEntries(equations),
+          cardOperations,
+          cardCategoryIds,
+        })
+      } else {
+        // Resume — restore from saved data
+        const ops = td.cardOperations ?? {}
+        const cats = td.cardCategoryIds ?? {}
+        const eqs = td.cardEquations ?? {}
+        for (let n = 1; n <= 10; n++) {
+          const op = ops[n] as Operation | undefined
+          if (op) blandaMeta[n] = { operation: op, categoryId: cats[n] ?? 0 }
+          const eq = eqs[n]
+          if (eq) equations.set(n, eq)
+        }
+      }
+
+      const deck: GameCard[] = deckCards.map(card => {
+        const eq = equations.get(card.n)
+        const meta = blandaMeta[card.n]
+        return { ...card, a: eq?.a, b: eq?.b, operation: meta?.operation, categoryId: meta?.categoryId }
+      })
+
+      savedTdRef.current = td
+      const current = pickRandom(deck)
+      const partialState: GameState = {
+        table: BLANDA_TABLE_ID,
+        categoryId: BLANDA_TABLE_ID,
+        operation: 'multiply',
+        equations,
+        deck,
+        clearPile: [],
+        retryPile: [],
+        current,
+        question: '',
+        answer: 0,
+        backLabel: '',
+        peeked: false,
+        peekUsedSaver: false,
+        busy: false,
+        blandaMeta,
+      }
+      const display = computeCardDisplay(partialState, current)
+      const newState: GameState = { ...partialState, ...display }
+      gsRef.current = newState
+      setGameState(newState)
+      return
+    }
+
+    // --- Regular category ---
     const catDef = getCategoryDef(categoryId)
     const operation: Operation = catDef?.operation ?? 'multiply'
-    // For multiply, table = categoryId; for plus/minus, table = categoryId (used as storage key)
     const table = categoryId
 
     const userData = await storage.getUser(username)
@@ -149,6 +234,7 @@ export function useGame(username: string) {
       peeked: false,
       peekUsedSaver: false,
       busy: false,
+      blandaMeta: null,
     }
     const display = computeCardDisplay(partialState, current)
     const newState: GameState = { ...partialState, ...display }
@@ -157,7 +243,7 @@ export function useGame(username: string) {
   }, [username])
 
   const endRound = useCallback((state: GameState) => {
-    const { table, clearPile, retryPile, categoryId } = state
+    const { table, clearPile, retryPile, categoryId, blandaMeta } = state
     const td = savedTdRef.current
 
     const { newClear, newRetry, allClear, wins } = computeEndRound(td, clearPile, retryPile)
@@ -173,9 +259,11 @@ export function useGame(username: string) {
 
     // Spara i bakgrunden – blockerar inte UI
     const cardEquations = state.equations.size > 0 ? Object.fromEntries(state.equations) : undefined
+    const cardOperations = blandaMeta ? Object.fromEntries(Object.entries(blandaMeta).map(([k, v]) => [k, v.operation])) : undefined
+    const cardCategoryIds = blandaMeta ? Object.fromEntries(Object.entries(blandaMeta).map(([k, v]) => [k, v.categoryId])) : undefined
     const savePromise = allClear
       ? storage.saveCompletedRound(username, table, { wins, clear: [], retry: [] })
-      : storage.saveTableData(username, table, { wins, clear: newClear, retry: newRetry, cardEquations })
+      : storage.saveTableData(username, table, { wins, clear: newClear, retry: newRetry, cardEquations, cardOperations, cardCategoryIds })
     savePromise.catch(err => console.error('Failed to save round result:', err))
   }, [username])
 
@@ -184,9 +272,11 @@ export function useGame(username: string) {
     if (bgSaveTimerRef.current) clearTimeout(bgSaveTimerRef.current)
     bgSaveTimerRef.current = setTimeout(() => {
       const { newClear, newRetry, wins } = computeEndRound(savedTdRef.current, clearPile, retryPile)
-      const eqs = gsRef.current.equations
-      const cardEquations = eqs.size > 0 ? Object.fromEntries(eqs) : undefined
-      storage.saveTableData(username, gsRef.current.table, { wins, clear: newClear, retry: newRetry, cardEquations })
+      const gs = gsRef.current
+      const cardEquations = gs.equations.size > 0 ? Object.fromEntries(gs.equations) : undefined
+      const cardOperations = gs.blandaMeta ? Object.fromEntries(Object.entries(gs.blandaMeta).map(([k, v]) => [k, v.operation])) : undefined
+      const cardCategoryIds = gs.blandaMeta ? Object.fromEntries(Object.entries(gs.blandaMeta).map(([k, v]) => [k, v.categoryId])) : undefined
+      storage.saveTableData(username, gs.table, { wins, clear: newClear, retry: newRetry, cardEquations, cardOperations, cardCategoryIds })
         .catch(err => console.error('Background save failed:', err))
     }, 2000)
   }, [username])
@@ -233,12 +323,14 @@ export function useGame(username: string) {
     if (gs.busy || !gs.current) return 'invalid'
     if (isNaN(value)) return 'invalid'
 
-    const a = gs.operation === 'multiply' ? gs.table : (gs.current.a ?? 0)
-    const b = gs.operation === 'multiply' ? gs.current.n : (gs.current.b ?? 0)
-    const isTenFriends = gs.categoryId === TEN_FRIENDS_CATEGORY_ID && gs.operation === 'add'
+    const cardOp = gs.current.operation ?? gs.operation
+    const cardCatId = gs.current.categoryId ?? gs.categoryId
+    const a = cardOp === 'multiply' ? (gs.current.a ?? gs.table) : (gs.current.a ?? 0)
+    const b = cardOp === 'multiply' ? (gs.current.b ?? gs.current.n) : (gs.current.b ?? 0)
+    const isTenFriends = cardCatId === TEN_FRIENDS_CATEGORY_ID && cardOp === 'add'
     const isCorrect = isTenFriends
       ? isCorrectTenFriendsAnswer(a, value)
-      : isCorrectAnswer(gs.operation, a, b, value)
+      : isCorrectAnswer(cardOp, a, b, value)
 
     if (isCorrect) {
       updateState(prev => ({ ...prev, busy: true }))
@@ -272,7 +364,9 @@ export function useGame(username: string) {
 
     const { newClear, newRetry, wins } = computeEndRound(savedTdRef.current, gs.clearPile, gs.retryPile)
     const cardEquations = gs.equations.size > 0 ? Object.fromEntries(gs.equations) : undefined
-    await storage.saveTableData(username, gs.table, { wins, clear: newClear, retry: newRetry, cardEquations })
+    const cardOperations = gs.blandaMeta ? Object.fromEntries(Object.entries(gs.blandaMeta).map(([k, v]) => [k, v.operation])) : undefined
+    const cardCategoryIds = gs.blandaMeta ? Object.fromEntries(Object.entries(gs.blandaMeta).map(([k, v]) => [k, v.categoryId])) : undefined
+    await storage.saveTableData(username, gs.table, { wins, clear: newClear, retry: newRetry, cardEquations, cardOperations, cardCategoryIds })
   }, [username])
 
   return {

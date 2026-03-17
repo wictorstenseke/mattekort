@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks'
 import type { RoundResult } from '../hooks/useGame'
-import { getCategoryDef, EASY_CATEGORY_IDS } from '../lib/constants'
+import { getCategoryDef, EASY_CATEGORY_IDS, BLANDA_TABLE_ID, BLANDA_CREDITS } from '../lib/constants'
 import { storage } from '../lib/storageContext'
 
 interface CompletePageProps {
@@ -61,8 +61,9 @@ function getReaction(allClear: boolean, clearCount: number, retryCount: number):
 
 export function CompletePage({ result, user, onContinue, onBack }: CompletePageProps) {
   const { clearCount, retryCount, allClear, categoryId, wins } = result
-  const categoryLabel = getCategoryDef(categoryId)?.label ?? `${categoryId}:ans tabell`
-  const creditReward = EASY_CATEGORY_IDS.has(categoryId) ? 1 : 4
+  const isBlanda = categoryId === BLANDA_TABLE_ID
+  const categoryLabel = isBlanda ? 'Blanda' : (getCategoryDef(categoryId)?.label ?? `${categoryId}:ans tabell`)
+  const creditReward = isBlanda ? BLANDA_CREDITS : (EASY_CATEGORY_IDS.has(categoryId) ? 1 : 4)
   const confettiRef = useRef<HTMLDivElement>(null)
   const [reaction] = useState(() => getReaction(allClear, clearCount, retryCount))
 

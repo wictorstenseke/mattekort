@@ -30,6 +30,12 @@ export interface CategoryDef {
 
 export const TEN_FRIENDS_CATEGORY_ID = 12
 
+/** Special table ID for the Blanda (mix) mode. */
+export const BLANDA_TABLE_ID = 99
+
+/** Credits awarded for completing a Blanda round. */
+export const BLANDA_CREDITS = 10
+
 /** Category IDs where only 1 credit / 1 Peek Saver is awarded (easy tables). */
 export const EASY_CATEGORY_IDS = new Set([1, 10, TEN_FRIENDS_CATEGORY_ID])
 
@@ -229,4 +235,26 @@ export const ALL_CATEGORIES: CategoryDef[] = [
 
 export function getCategoryDef(id: number): CategoryDef | undefined {
   return ALL_CATEGORIES.find(c => c.id === id)
+}
+
+/** Generate 10 random equations drawn from the given categories, for Blanda mode. */
+export function generateBlandaDeck(
+  categories: CategoryDef[],
+): Array<{ a: number; b: number; operation: Operation; categoryId: number }> {
+  const pool: Array<{ a: number; b: number; operation: Operation; categoryId: number }> = []
+
+  for (const cat of categories) {
+    if (cat.operation === 'multiply') {
+      for (let n = 1; n <= 10; n++) {
+        pool.push({ a: cat.id, b: n, operation: 'multiply', categoryId: cat.id })
+      }
+    } else if (cat.generateEquations) {
+      const eqs = cat.generateEquations()
+      for (const eq of eqs) {
+        pool.push({ ...eq, operation: cat.operation, categoryId: cat.id })
+      }
+    }
+  }
+
+  return shuffle(pool).slice(0, 10)
 }

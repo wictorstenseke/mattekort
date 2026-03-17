@@ -107,8 +107,8 @@ export function useGame(username: string) {
       const availableCats = ALL_CATEGORIES.filter(cat => activeCatIds === null || activeCatIds.includes(cat.id))
 
       let deckCards = buildDeck(td)
-      let blandaMeta: Record<number, { operation: Operation; categoryId: number }> = {}
-      let equations = new Map<number, { a: number; b: number }>()
+      const blandaMeta: Record<number, { operation: Operation; categoryId: number }> = {}
+      const equations = new Map<number, { a: number; b: number }>()
 
       const hasCardMeta = td.cardOperations && Object.keys(td.cardOperations).length > 0
       if (!hasCardMeta) {

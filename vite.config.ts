@@ -4,7 +4,7 @@ import preact from '@preact/preset-vite'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const base = process.env.GITHUB_PAGES === 'true' ? '/mattekort/' : '/'
+const base = process.env.GITHUB_PAGES === 'true' ? '/rakneresan/' : '/'
 
 export default defineConfig({
   base,

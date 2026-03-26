@@ -264,6 +264,9 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
 .card-front { background: var(--surface); border: 4px solid var(--tc); }
 .card-back { background: var(--tc); transform: rotateY(180deg); color: white; }
 .card-question { font-family: 'Fredoka One', cursive; font-size: 4rem; color: var(--text); line-height: 1.1; }
+.card-question-text-split { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.card-question-prefix { font-family: 'Fredoka', sans-serif; font-weight: 500; font-size: 1.4rem; color: var(--text); line-height: 1.2; }
+.card-question-number { font-family: 'Fredoka One', cursive; font-size: 4rem; color: var(--text); line-height: 1.1; }
 .card-question-division { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .card-question-division .fraction-num,
 .card-question-division .fraction-den { font-family: 'Fredoka One', cursive; font-size: 3.5rem; color: var(--text); line-height: 1; }
@@ -434,6 +437,7 @@ img.login-emoji { width: 80px; height: 80px; margin-left: auto; margin-right: au
   .pile-box .pile-count { font-size: 1.4rem; }
   .flashcard { height: 160px; }
   .card-question { font-size: 3rem; }
+  .card-question-number { font-size: 3rem; }
   .card-question-division .fraction-num,
   .card-question-division .fraction-den { font-size: 2.8rem; }
   .card-question-division .fraction-line { width: 80px; height: 5px; }

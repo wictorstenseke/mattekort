@@ -3,7 +3,7 @@ import { storage } from '../lib/storageContext'
 import type { TableData } from '../lib/storage'
 import { buildDeck, isCorrectAnswer, isCorrectTenFriendsAnswer, computeEndRound } from '../lib/game-logic'
 import type { GameCard } from '../lib/game-logic'
-import { getCategoryDef, TEN_FRIENDS_CATEGORY_ID, BLANDA_TABLE_ID, generateBlandaDeck, ALL_CATEGORIES } from '../lib/constants'
+import { getCategoryDef, TEN_FRIENDS_CATEGORY_ID, DUBBELT_CATEGORY_ID, HALVTEN_CATEGORY_ID, BLANDA_TABLE_ID, generateBlandaDeck, ALL_CATEGORIES } from '../lib/constants'
 import type { Operation } from '../lib/constants'
 import { opSymbol } from '../lib/hint-utils'
 
@@ -59,10 +59,24 @@ function computeCardDisplay(state: GameState, card: GameCard): { question: strin
   const a = op === 'multiply' ? (card.a ?? state.table) : (card.a ?? 0)
   const b = op === 'multiply' ? (card.b ?? card.n) : (card.b ?? 0)
   const isTenFriends = catId === TEN_FRIENDS_CATEGORY_ID && op === 'add'
+  const isDubbelt = catId === DUBBELT_CATEGORY_ID
+  const isHalften = catId === HALVTEN_CATEGORY_ID
   const sym = opSymbol(op)
-  const question = isTenFriends ? `${a} + ?` : `${a} ${sym} ${b}`
   const answer = isTenFriends ? b : op === 'multiply' ? a * b : op === 'add' ? a + b : op === 'divide' ? a / b : a - b
-  const backLabel = isTenFriends ? `${a} + ${b} = 10` : `${question} = ${answer}`
+  const question = isTenFriends
+    ? `${a} + ?`
+    : isDubbelt
+    ? `Dubbelt av ${a}`
+    : isHalften
+    ? `Hälften av ${a}`
+    : `${a} ${sym} ${b}`
+  const backLabel = isTenFriends
+    ? `${a} + ${b} = 10`
+    : isDubbelt
+    ? `Dubbelt av ${a} = ${answer}`
+    : isHalften
+    ? `Hälften av ${a} = ${answer}`
+    : `${question} = ${answer}`
   return { question, answer, backLabel }
 }
 

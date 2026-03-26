@@ -166,8 +166,8 @@ describe('TEN_FRIENDS_CATEGORY_ID', () => {
 })
 
 describe('DIVIDE_CATEGORIES', () => {
-  it('has 4 categories', () => {
-    expect(DIVIDE_CATEGORIES).toHaveLength(4)
+  it('has 5 categories', () => {
+    expect(DIVIDE_CATEGORIES).toHaveLength(5)
   })
 
   it('each has operation divide, emoji, color, and generateEquations', () => {

@@ -29,6 +29,8 @@ export interface CategoryDef {
 }
 
 export const TEN_FRIENDS_CATEGORY_ID = 12
+export const DUBBELT_CATEGORY_ID = 15
+export const HALVTEN_CATEGORY_ID = 35
 
 /** Special table ID for the Blanda (mix) mode. */
 export const BLANDA_TABLE_ID = 99
@@ -47,6 +49,12 @@ function shuffle<T>(arr: T[]): T[] {
   }
   return a
 }
+
+const ROUND_TENS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+const DUBBELT_POOL: Array<{ a: number; b: number }> = ROUND_TENS.map(n => ({ a: n, b: n }))
+
+const HALVTEN_POOL: Array<{ a: number; b: number }> = ROUND_TENS.map(n => ({ a: n, b: 2 }))
 
 // --- Plus categories ---
 
@@ -146,6 +154,15 @@ export const PLUS_CATEGORIES: CategoryDef[] = [
     color2: '#00C9A7',
     generateEquations: () => shuffle(LATT_HUNDRA_POOL).slice(0, 10),
   },
+  {
+    id: DUBBELT_CATEGORY_ID,
+    operation: 'add',
+    label: 'Dubbelt',
+    emoji: '🏎️',
+    color: '#FF4E50',
+    color2: '#F9D423',
+    generateEquations: () => shuffle(DUBBELT_POOL),
+  },
 ]
 
 export const MINUS_CATEGORIES: CategoryDef[] = [
@@ -223,6 +240,15 @@ export const DIVIDE_CATEGORIES: CategoryDef[] = [
     color: '#FFB703',
     color2: '#FB8500',
     generateEquations: () => shuffle(Array.from({ length: 10 }, (_, i) => ({ a: (i + 1) * 5, b: 5 }))),
+  },
+  {
+    id: HALVTEN_CATEGORY_ID,
+    operation: 'divide',
+    label: 'Hälften',
+    emoji: '🚵',
+    color: '#56CCF2',
+    color2: '#2F80ED',
+    generateEquations: () => shuffle(HALVTEN_POOL),
   },
 ]
 

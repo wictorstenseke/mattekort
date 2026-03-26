@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'preact/hooks'
 import { ThemeToggle } from '../components/ThemeToggle'
 import { TopHeader } from '../components/TopHeader'
-import { getCategoryDef, BLANDA_TABLE_ID } from '../lib/constants'
+import { getCategoryDef, BLANDA_TABLE_ID, HALVTEN_CATEGORY_ID, DUBBELT_CATEGORY_ID } from '../lib/constants'
 import { useGame } from '../hooks/useGame'
 import { NumericKeypad } from '../components/NumericKeypad'
 import { HintModal } from '../components/HintModal'
@@ -253,11 +253,16 @@ export function GamePage({ categoryId, user, onBack, onComplete }: GamePageProps
             >
               <div class={`flashcard${flipped ? ' flipped' : ''}${shaking ? ' wrong' : ''}${answerState === 'correct' && !showAnswerAfterWrong ? ' correct' : ''}`}>
                 <div class="card-face card-front">
-                  {currentOp === 'divide' && current?.a != null && current?.b != null ? (
+                  {currentOp === 'divide' && categoryId !== HALVTEN_CATEGORY_ID && current?.a != null && current?.b != null ? (
                     <div class="card-question-division">
                       <div class="fraction-num">{current.a}</div>
                       <div class="fraction-line" />
                       <div class="fraction-den">{current.b}</div>
+                    </div>
+                  ) : (categoryId === DUBBELT_CATEGORY_ID || categoryId === HALVTEN_CATEGORY_ID) && current?.a != null ? (
+                    <div class="card-question-text-split">
+                      <span class="card-question-prefix">{categoryId === DUBBELT_CATEGORY_ID ? 'Dubbelt av' : 'Hälften av'}</span>
+                      <span class="card-question-number">{current.a}</span>
                     </div>
                   ) : (
                     <div class="card-question">{question}</div>
